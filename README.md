@@ -49,13 +49,26 @@ npm run dev
 
 ### Miljøvariablar
 
-| Variabel                | Skildring                                 |
-| ----------------------- | ----------------------------------------- |
-| `NOTION_TOKEN`          | Notion-integrasjonstoken (server-secret). |
-| `NOTION_DATA_SOURCE_ID` | Data source-id for `cctv.oslo`-databasen. |
-| `CACHE_TTL_MS`          | (valfritt) cache-TTL i ms, standard 7000. |
+| Variabel                       | Skildring                                          |
+| ------------------------------ | -------------------------------------------------- |
+| `NOTION_TOKEN`                 | Notion-integrasjonstoken (server-secret).          |
+| `NOTION_DATA_SOURCE_ID`        | Data source-id for `cctv.oslo`-databasen.          |
+| `NOTION_USERS_DATA_SOURCE_ID`  | Data source-id for `cctv.oslo brukarar`-databasen. |
+| `AUTH_SECRET`                  | Lang tilfeldig streng for å signere session-cookie. |
+| `CACHE_TTL_MS`                 | (valfritt) cache-TTL i ms, standard 7000.          |
 
-Integrasjonen må ha databasen `cctv.oslo` **delt** med seg (Notion → Connections).
+Integrasjonen må ha **begge** databasane (`cctv.oslo` og `cctv.oslo brukarar`)
+delt med seg (Notion → Connections).
+
+### Brukarkontoar
+
+Trykk på eyeball-teljaren → lag konto med **brukarnamn + passord** (ingen e-post).
+Kontoar er valfrie; utan konto er du ein anonym handle. Passord vert hasha med
+scrypt (salt:hash) og lagra i Notion-databasen `cctv.oslo brukarar`; økta er ein
+signert HttpOnly-cookie. Innlogga brukarar får eyeballs lagra serverside.
+
+> Handrulla auth for ein open sivil app — ikkje bank-nivå. Ingen e-post tyder at
+> **mista passord = mista konto** (inga gjenoppretting).
 
 ### Vercel
 

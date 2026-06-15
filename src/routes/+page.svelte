@@ -9,6 +9,7 @@
 	import AddCameraForm from '$lib/components/AddCameraForm.svelte';
 	import NearbyList from '$lib/components/NearbyList.svelte';
 	import Autocomplete from '$lib/components/Autocomplete.svelte';
+	import AuthSheet from '$lib/components/AuthSheet.svelte';
 	import {
 		cameras,
 		loading,
@@ -31,6 +32,7 @@
 	let toast = $state<string | null>(null);
 	let snap = $state<Snap>('peek');
 	let prefillName = $state('');
+	let authOpen = $state(false);
 
 	let mapComp: Map;
 
@@ -199,8 +201,12 @@
 
 	<div class="topbar">
 		<div class="brand">cctv.oslo.no</div>
-		<EyeballCounter />
+		<EyeballCounter onclick={() => (authOpen = true)} />
 	</div>
+
+	{#if authOpen}
+		<AuthSheet onclose={() => (authOpen = false)} />
+	{/if}
 
 	{#if showChrome}
 		<div class="searchbar">

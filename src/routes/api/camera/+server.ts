@@ -1,7 +1,8 @@
 import { error, json } from '@sveltejs/kit';
 import { createCamera } from '$lib/server/notion';
 import { invalidateCache, patchCache } from '$lib/server/cache';
-import { KATEGORIAR, type CreateCameraInput } from '$lib/types';
+import { awardEyeballs } from '$lib/server/notionUsers';
+import { EYEBALL_REWARD, KATEGORIAR, type CreateCameraInput } from '$lib/types';
 import type { RequestHandler } from './$types';
 
 function isLat(n: unknown): n is number {
@@ -12,7 +13,7 @@ function isLng(n: unknown): n is number {
 }
 
 // POST /api/camera — add a new camera point.
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	let body: Partial<CreateCameraInput>;
 	try {
 		body = await request.json();
@@ -27,6 +28,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		throw error(400, 'Ukjend kategori');
 	}
 
+	// Prefer the authenticated handle over whatever the client sent.
+	const handle =
+		locals.user?.handle ?? (typeof body.handle === 'string' ? body.handle.trim() : undefined);
+
 	const camera = await createCamera({
 		namn,
 		kategori: body.kategori,
@@ -34,8 +39,16 @@ export const POST: RequestHandler = async ({ request }) => {
 		lng: body.lng,
 		kamerastatus: body.kamerastatus,
 		kjeldenotat: typeof body.kjeldenotat === 'string' ? body.kjeldenotat.trim() : undefined,
-		handle: typeof body.handle === 'string' ? body.handle.trim() : undefined
+		handle
 	});
+
+	if (locals.user) {
+		try {
+			await awardEyeballs(locals.user.handle, EYEBALL_REWARD.add);
+		} catch {
+			/* eyeball award is best-effort */
+		}
+	}
 
 	patchCache(camera);
 	invalidateCache();
