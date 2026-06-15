@@ -1,14 +1,19 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { KATEGORIAR, type Kategori } from '$lib/types';
+	import Autocomplete from './Autocomplete.svelte';
+	import type { GeocodeHit } from '../../routes/api/geocode/+server';
 
 	interface Props {
 		onsubmit?: (data: { namn: string; kategori: Kategori; confirm: boolean }) => void;
 		oncancel?: () => void;
+		ongeocode?: (hit: GeocodeHit) => void;
+		initialName?: string;
 		busy?: boolean;
 	}
-	let { onsubmit, oncancel, busy = false }: Props = $props();
+	let { onsubmit, oncancel, ongeocode, initialName = '', busy = false }: Props = $props();
 
-	let namn = $state('');
+	let namn = $state(untrack(() => initialName));
 	let kategori = $state<Kategori>('CCTV / kamera');
 	let confirm = $state(false);
 
@@ -17,10 +22,17 @@
 
 <div class="form">
 	<h2>Nytt kamerapunkt</h2>
-	<p class="sub">Punktet vert lagt der krysshåret står på kartet.</p>
+	<p class="sub">Søk opp staden, eller flytt krysshåret på kartet.</p>
 
 	<label for="namn">Namn / stad</label>
-	<input id="namn" bind:value={namn} placeholder="t.d. Tøyen skule" maxlength="120" />
+	<Autocomplete
+		bind:value={namn}
+		placeholder="t.d. Fresh Fitness St. Hanshaugen"
+		onselect={(hit) => {
+			namn = hit.namn;
+			ongeocode?.(hit);
+		}}
+	/>
 
 	<label for="kat">Kategori</label>
 	<select id="kat" bind:value={kategori}>
