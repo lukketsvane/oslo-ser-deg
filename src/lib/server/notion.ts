@@ -12,20 +12,20 @@ import {
 
 // Notion property names (exact, including spaces and Norwegian characters).
 const P = {
-	namn: 'Namn',
+	namn: 'Navn',
 	kategori: 'Kategori',
-	eigar: 'Eigar / operatør',
+	eigar: 'Eier / operatør',
 	kamerastatus: 'Kamerastatus',
-	kameraTal: 'Kamera (tal)',
-	lat: 'Breiddegrad',
+	kameraTal: 'Kamera (antall)',
+	lat: 'Breddegrad',
 	lng: 'Lengdegrad',
-	stadfestingar: 'Stadfestingar',
-	semje: 'Semje %',
-	bidragsytarar: 'Bidragsytarar',
+	stadfestingar: 'Bekreftelser',
+	semje: 'Enighet %',
+	bidragsytarar: 'Bidragsytere',
 	bydel: 'Bydel / område',
 	typeUndertype: 'Type / undertype',
-	kjeldeUrlar: 'Kjelde-URL-ar',
-	kjeldenotat: 'Kjeldenotat',
+	kjeldeUrlar: 'Kilde-URL-er',
+	kjeldenotat: 'Kildenotat',
 	sistOppdatert: 'Sist oppdatert'
 } as const;
 
@@ -138,8 +138,8 @@ export async function createCamera(input: CreateCameraInput): Promise<Camera> {
 			[P.kamerastatus]: selectProp(status),
 			[P.lat]: numberProp(input.lat),
 			[P.lng]: numberProp(input.lng),
-			[P.stadfestingar]: numberProp(status === 'Stadfesta' ? 1 : 0),
-			[P.semje]: numberProp(status === 'Stadfesta' ? 100 : 0),
+			[P.stadfestingar]: numberProp(status === 'Bekreftet' ? 1 : 0),
+			[P.semje]: numberProp(status === 'Bekreftet' ? 100 : 0),
 			[P.bidragsytarar]: richTextProp(handles.join(' ')),
 			[P.kjeldenotat]: richTextProp(input.kjeldenotat ?? ''),
 			[P.sistOppdatert]: { date: { start: today() } }
@@ -190,13 +190,13 @@ export async function addContribution(
 		[P.sistOppdatert]: { date: { start: today() } }
 	};
 
-	// Promote Estimert → Stadfesta once enough confirmations gathered.
+	// Promote Estimert → Bekreftet once enough confirmations gathered.
 	if (
 		opts.confirm &&
-		current.kamerastatus !== 'Stadfesta' &&
+		current.kamerastatus !== 'Bekreftet' &&
 		stadfestingar >= opts.promoteThreshold
 	) {
-		properties[P.kamerastatus] = selectProp('Stadfesta');
+		properties[P.kamerastatus] = selectProp('Bekreftet');
 	}
 
 	const page = await notion().pages.update({ page_id: pageId, properties });

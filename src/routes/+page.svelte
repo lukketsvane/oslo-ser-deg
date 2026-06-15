@@ -53,7 +53,7 @@
 		let estimat = 0;
 		let oppdrag = 0;
 		for (const c of $cameras) {
-			if (c.kamerastatus === 'Stadfesta') bekrefta++;
+			if (c.kamerastatus === 'Bekreftet') bekrefta++;
 			else if (c.kamerastatus === 'Estimert') estimat++;
 			if (c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent') oppdrag++;
 		}
@@ -62,7 +62,7 @@
 
 	const visible = $derived.by(() => {
 		const list = $cameras;
-		if (tab === 'Bekreftet') return list.filter((c) => c.kamerastatus === 'Stadfesta');
+		if (tab === 'Bekreftet') return list.filter((c) => c.kamerastatus === 'Bekreftet');
 		if (tab === 'Estimat') return list.filter((c) => c.kamerastatus === 'Estimert');
 		return list.filter((c) => c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent');
 	});
@@ -78,6 +78,14 @@
 	function flash(msg: string) {
 		toast = msg;
 		setTimeout(() => (toast = null), 2400);
+	}
+
+	function selectTab(t: Tab) {
+		tab = t;
+		// Oppdrag = unconfirmed cameras near you, so ask for location if we don't
+		// have it yet (NearbyList then ranks the missions by distance).
+		if (t === 'Oppdrag' && !userLatLng) locateMe();
+		if (t === 'Oppdrag' && snap === 'peek') snap = 'half';
 	}
 
 	function openInfo() {
@@ -172,7 +180,7 @@
 				kategori: data.kategori,
 				lat: pending.lat,
 				lng: pending.lng,
-				kamerastatus: data.confirm ? 'Stadfesta' : 'Estimert',
+				kamerastatus: data.confirm ? 'Bekreftet' : 'Estimert',
 				handle: $identity.handle
 			});
 			identity.award(EYEBALL_REWARD.add);
@@ -231,7 +239,7 @@
 		</div>
 		<div class="tabs-top">
 			{#each tabs as t}
-				<button class="chip" class:active={tab === t} onclick={() => (tab = t)}>
+				<button class="chip" class:active={tab === t} onclick={() => selectTab(t)}>
 					<i class={t === 'Bekreftet' ? 'blue' : t === 'Estimat' ? 'violet' : 'grey'}></i>
 					<span>{t}</span>
 					<b>{tabCount(t)}</b>
@@ -274,7 +282,7 @@
 					<header><strong>Siste punkter</strong><button onclick={() => (snap = 'half')}>Se kart</button></header>
 					{#each recent as cam}
 						<button class="mini-row" onclick={() => openCamera(cam)}>
-							<i class={cam.kamerastatus === 'Stadfesta' ? 'blue' : cam.kamerastatus === 'Estimert' ? 'violet' : 'grey'}></i>
+							<i class={cam.kamerastatus === 'Bekreftet' ? 'blue' : cam.kamerastatus === 'Estimert' ? 'violet' : 'grey'}></i>
 							<span>{cam.namn}</span>
 							<small>{cam.bydel ?? 'Oslo'}</small>
 						</button>

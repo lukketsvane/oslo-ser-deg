@@ -22,10 +22,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const namn = typeof body.namn === 'string' ? body.namn.trim() : '';
-	if (!namn) throw error(400, 'Namn er påkravd');
-	if (!isLat(body.lat) || !isLng(body.lng)) throw error(400, 'Ugyldige koordinatar');
+	if (!namn) throw error(400, 'Navn er påkrevd');
+	if (!isLat(body.lat) || !isLng(body.lng)) throw error(400, 'Ugyldige koordinater');
 	if (body.kategori && !KATEGORIAR.includes(body.kategori)) {
-		throw error(400, 'Ukjend kategori');
+		throw error(400, 'Ukjent kategori');
 	}
 
 	// Prefer the authenticated handle over whatever the client sent.
