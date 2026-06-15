@@ -8,6 +8,7 @@
 	import ContributionForm from '$lib/components/ContributionForm.svelte';
 	import AddCameraForm from '$lib/components/AddCameraForm.svelte';
 	import NearbyList from '$lib/components/NearbyList.svelte';
+	import Autocomplete from '$lib/components/Autocomplete.svelte';
 	import {
 		cameras,
 		loading,
@@ -23,18 +24,18 @@
 	type Tab = 'Bekrefta' | 'Estimat' | 'Oppdrag';
 
 	let mode = $state<Mode>('browse');
-	let tab = $state<Tab>('Bekrefta');
+	let tab = $state<Tab>('Estimat');
 	let selected = $state<Camera | null>(null);
 	let userLatLng = $state<{ lat: number; lng: number } | null>(null);
 	let busy = $state(false);
 	let toast = $state<string | null>(null);
 	let snap = $state<Snap>('peek');
+	let prefillName = $state('');
 
 	let mapComp: Map;
 
 	onMount(() => startPolling(7000));
 
-	// Keep `selected` in sync with the freshest polled data.
 	$effect(() => {
 		if (selected) {
 			const fresh = $cameras.find((c) => c.id === selected!.id);
@@ -126,6 +127,7 @@
 
 	function startPlaceNew() {
 		selected = null;
+		prefillName = '';
 		mode = 'place-new';
 		snap = 'peek';
 	}
@@ -137,6 +139,15 @@
 		pending = { lat: c.lat, lng: c.lng };
 		mode = 'add-form';
 		snap = 'half';
+	}
+
+	// global search: fly there and start placing a point at that spot
+	function onSearchSelect(hit: { namn: string; lat: number; lng: number }) {
+		mapComp?.flyTo(hit.lat, hit.lng, 17);
+		pending = { lat: hit.lat, lng: hit.lng };
+		prefillName = hit.namn;
+		mode = 'place-new';
+		snap = 'peek';
 	}
 
 	async function saveNew(data: { namn: string; kategori: Kategori; confirm: boolean }) {
@@ -173,12 +184,13 @@
 	}
 
 	const adjusting = $derived(mode === 'adjust-move' || mode === 'place-new');
+	const showChrome = $derived(mode === 'browse' || mode === 'detail' || mode === 'contribute');
 </script>
 
 <div class="app">
 	<Map
 		bind:this={mapComp}
-		cameras={mode === 'browse' || mode === 'detail' || mode === 'contribute' ? visible : $cameras}
+		cameras={showChrome ? visible : $cameras}
 		selectedId={selected?.id}
 		adjustMode={adjusting}
 		onselect={openCamera}
@@ -190,7 +202,10 @@
 		<EyeballCounter />
 	</div>
 
-	{#if mode === 'browse' || mode === 'detail' || mode === 'contribute'}
+	{#if showChrome}
+		<div class="searchbar">
+			<Autocomplete placeholder="Søk adresse eller bedrift…" onselect={onSearchSelect} />
+		</div>
 		<div class="tabs-top">
 			{#each ['Bekrefta', 'Estimat', 'Oppdrag'] as const as t}
 				<button class="chip" class:active={tab === t} onclick={() => (tab = t)}>{t}</button>
@@ -198,7 +213,7 @@
 		</div>
 	{/if}
 
-	{#if mode === 'browse' && snap === 'peek'}
+	{#if mode !== 'adjust-move' && mode !== 'place-new'}
 		<button class="fab locate" onclick={locateMe} aria-label="Finn meg">◎</button>
 	{/if}
 
@@ -206,7 +221,7 @@
 		<div class="toast">{toast}</div>
 	{/if}
 
-	<BottomSheet bind:snap peekPx={148}>
+	<BottomSheet bind:snap peekPx={140}>
 		{#if mode === 'detail' && selected}
 			<button class="close" onclick={close} aria-label="Lukk">✕</button>
 			<CameraDetail
@@ -239,9 +254,17 @@
 				<button class="btn btn-ghost" onclick={close}>Avbryt</button>
 			</div>
 		{:else if mode === 'add-form'}
-			<AddCameraForm {busy} onsubmit={saveNew} oncancel={() => (mode = 'place-new')} />
+			<AddCameraForm
+				{busy}
+				initialName={prefillName}
+				onsubmit={saveNew}
+				ongeocode={(hit) => {
+					pending = { lat: hit.lat, lng: hit.lng };
+					mapComp?.flyTo(hit.lat, hit.lng, 17);
+				}}
+				oncancel={() => (mode = 'place-new')}
+			/>
 		{:else if snap === 'peek'}
-			<!-- collapsed peek: minimal summary + primary action -->
 			<div class="peek">
 				<div class="peek-row">
 					<div>
@@ -262,7 +285,6 @@
 				{/if}
 			</div>
 		{:else}
-			<!-- expanded: the list -->
 			<div class="sheet-head">
 				<h1>{tab === 'Oppdrag' ? 'Oppdrag nær deg' : 'Nær deg'}</h1>
 				<span class="count">{visible.length} punkt</span>
@@ -301,7 +323,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: calc(env(safe-area-inset-top) + 10px) 14px 10px;
+		padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
 		background: linear-gradient(rgba(11, 16, 32, 0.55), transparent);
 		pointer-events: none;
 	}
@@ -314,12 +336,25 @@
 		font-size: 15px;
 		text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 	}
+	.searchbar {
+		position: absolute;
+		top: calc(env(safe-area-inset-top) + 44px);
+		left: 12px;
+		right: 12px;
+		z-index: 650;
+	}
+	.searchbar :global(input) {
+		border-radius: 999px;
+		box-shadow: var(--shadow);
+		border-color: transparent;
+		padding: 11px 16px;
+	}
 	.tabs-top {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 54px);
+		top: calc(env(safe-area-inset-top) + 92px);
 		left: 0;
 		right: 0;
-		z-index: 650;
+		z-index: 640;
 		display: flex;
 		gap: 8px;
 		justify-content: center;
@@ -328,6 +363,7 @@
 	.fab {
 		position: absolute;
 		right: 16px;
+		bottom: 160px;
 		z-index: 590;
 		width: 46px;
 		height: 46px;
@@ -338,11 +374,7 @@
 		font-size: 20px;
 		color: var(--ink);
 	}
-	.fab.locate {
-		bottom: 164px;
-	}
 
-	/* peek */
 	.peek {
 		display: grid;
 		gap: 12px;
@@ -386,7 +418,6 @@
 	.d.violet {
 		background: var(--violet);
 	}
-
 	.sheet-head {
 		display: flex;
 		align-items: baseline;
@@ -429,7 +460,7 @@
 	}
 	.toast {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 100px);
+		top: calc(env(safe-area-inset-top) + 140px);
 		left: 50%;
 		transform: translateX(-50%);
 		z-index: 700;
