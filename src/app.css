@@ -1,14 +1,20 @@
 :root {
-	--bg: #0b1020;
-	--panel: #ffffff;
-	--ink: #0b1020;
-	--muted: #6b7280;
-	--line: #e5e7eb;
-	--blue: #1d6fff;
-	--violet: #a855f7;
-	--green: #16a34a;
-	--radius: 16px;
-	--shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+	--bg: #eef8f6;
+	--panel: rgba(255, 252, 244, 0.94);
+	--panel-solid: #fffaf0;
+	--ink: #063f3d;
+	--muted: #667b78;
+	--line: rgba(6, 63, 61, 0.12);
+	--blue: #005a55;
+	--violet: #ff736d;
+	--green: #00866d;
+	--aqua: #b9f1ef;
+	--sand: #e4d4c3;
+	--coral: #ff736d;
+	--mustard: #ffc75e;
+	--radius: 18px;
+	--shadow: 0 14px 45px rgba(2, 40, 38, 0.18);
+	--shadow-soft: 0 8px 24px rgba(2, 40, 38, 0.12);
 }
 
 * {
@@ -24,7 +30,6 @@ body {
 	color: var(--ink);
 	background: var(--bg);
 	-webkit-font-smoothing: antialiased;
-	/* native feel: no rubber-band scroll, no tap flash, no long-press callout */
 	overscroll-behavior: none;
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
@@ -33,7 +38,6 @@ body {
 	touch-action: manipulation;
 }
 
-/* let people select/edit inside real inputs */
 input,
 textarea {
 	-webkit-user-select: text;
@@ -46,21 +50,26 @@ button {
 	-webkit-tap-highlight-color: transparent;
 	touch-action: manipulation;
 }
-/* tactile press */
+
 .btn,
 .chip,
 .fab,
-.eyeballs {
+.eyeballs,
+.brand-btn,
+.row {
 	transition:
 		transform 0.08s ease,
 		background 0.15s ease,
-		opacity 0.15s ease;
+		opacity 0.15s ease,
+		box-shadow 0.15s ease;
 }
 .btn:active,
 .chip:active,
 .fab:active,
-.eyeballs:active {
-	transform: scale(0.96);
+.eyeballs:active,
+.brand-btn:active,
+.row:active {
+	transform: scale(0.965);
 }
 
 .btn {
@@ -69,13 +78,15 @@ button {
 	justify-content: center;
 	gap: 8px;
 	width: 100%;
-	padding: 14px 16px;
+	padding: 13px 16px;
 	border: none;
 	border-radius: 999px;
 	background: var(--blue);
-	color: #fff;
-	font-weight: 600;
-	font-size: 15px;
+	color: #fffaf0;
+	font-weight: 720;
+	font-size: 14px;
+	letter-spacing: -0.01em;
+	box-shadow: 0 8px 20px rgba(0, 90, 85, 0.22);
 }
 .btn:disabled {
 	opacity: 0.55;
@@ -84,46 +95,50 @@ button {
 .btn-ghost {
 	background: transparent;
 	color: var(--blue);
+	box-shadow: none;
 }
 .btn-secondary {
-	background: #fff;
+	background: rgba(255, 250, 240, 0.82);
 	color: var(--ink);
 	border: 1px solid var(--line);
+	box-shadow: none;
 }
-/* compact variant — used inside dense bento panels */
 .btn-sm {
-	padding: 11px 14px;
-	font-size: 14px;
+	padding: 10px 13px;
+	font-size: 13px;
 }
-/* side-by-side button pair */
 .btn-row {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 8px;
 }
 
-/* bento fact grid — boxed label-over-value cells */
 .bento {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 8px;
 }
 .bento-cell {
-	background: #f6f7f9;
-	border-radius: 12px;
-	padding: 9px 11px;
+	background: rgba(255, 255, 255, 0.68);
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	padding: 10px 11px;
 	min-width: 0;
+	box-shadow: inset 0 -1px 0 rgba(6, 63, 61, 0.04);
 }
 .bento-cell .k {
 	display: block;
-	font-size: 11px;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	color: var(--muted);
-	margin-bottom: 2px;
+	margin-bottom: 3px;
 }
 .bento-cell .v {
 	display: block;
 	font-size: 14px;
-	font-weight: 600;
+	font-weight: 720;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -131,34 +146,33 @@ button {
 	grid-column: 1 / -1;
 }
 
-/* status tag pill */
 .tag {
 	display: inline-flex;
 	align-items: center;
-	font-size: 11px;
-	font-weight: 600;
+	font-size: 10px;
+	font-weight: 740;
 	line-height: 1;
-	padding: 3px 8px;
+	padding: 4px 8px;
 	border-radius: 999px;
 	white-space: nowrap;
+	letter-spacing: 0.02em;
 }
 .tag-grey {
-	background: #eef0f4;
-	color: var(--muted);
+	background: rgba(0, 90, 85, 0.08);
+	color: var(--blue);
 }
 .tag-warn {
-	background: #fff4d6;
-	color: #9a6700;
+	background: rgba(255, 199, 94, 0.28);
+	color: #7a5600;
 }
 .tag-ok {
-	background: #e7f6ec;
+	background: rgba(0, 134, 109, 0.12);
 	color: var(--green);
 }
 
-/* small coloured dot inside chips / legends */
 .cdot {
-	width: 9px;
-	height: 9px;
+	width: 8px;
+	height: 8px;
 	border-radius: 50%;
 	flex: none;
 	display: inline-block;
@@ -170,74 +184,99 @@ button {
 	background: var(--violet);
 }
 .cdot.grey {
-	background: #9aa3b2;
+	background: #9aa8a5;
 }
 
 .chip {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	padding: 6px 12px;
+	padding: 7px 12px;
 	border-radius: 999px;
-	border: 1px solid var(--line);
-	background: #fff;
-	font-size: 13px;
-	font-weight: 500;
-	color: var(--muted);
+	border: 1px solid rgba(6, 63, 61, 0.14);
+	background: rgba(255, 250, 240, 0.82);
+	backdrop-filter: blur(14px);
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--ink);
+	box-shadow: 0 5px 18px rgba(2, 40, 38, 0.1);
 }
 .chip.active {
-	border-color: var(--blue);
-	color: var(--blue);
-	background: #eef4ff;
+	border-color: rgba(0, 90, 85, 0.28);
+	color: #fffaf0;
+	background: rgba(0, 90, 85, 0.92);
 }
 
-.cctv-marker {
+.cctv-marker,
+.cctv-cluster,
+.user-dot {
 	background: transparent;
 	border: none;
 }
-
-/* marker cluster bubble (coloured by dominant status via --c) */
-.cctv-cluster {
-	background: transparent;
-	border: none;
+.cctv-marker .pin {
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--c) 88%, white);
+	border: 2px solid #fffaf0;
+	box-shadow: 0 3px 12px rgba(2, 40, 38, 0.28);
 }
+.cctv-marker .pin::before {
+	content: '';
+	width: 13px;
+	height: 7px;
+	border-radius: 999px 999px 48% 48%;
+	background: #fffaf0;
+}
+.cctv-marker .pin i {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #003f3b;
+}
+.cctv-marker .pin.selected {
+	box-shadow:
+		0 0 0 5px rgba(185, 241, 239, 0.72),
+		0 8px 24px rgba(2, 40, 38, 0.35);
+}
+
 .cctv-cluster .cl {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	border-radius: 50%;
-	background: var(--c);
-	color: #fff;
-	font-weight: 700;
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent),
+		var(--c);
+	color: #fffaf0;
+	font-weight: 800;
 	font-size: 13px;
-	border: 2px solid #fff;
-	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+	border: 2px solid #fffaf0;
+	box-shadow: 0 5px 18px rgba(2, 40, 38, 0.32);
 }
 
-/* "you are here" pulsing dot */
-.user-dot {
-	background: transparent;
-	border: none;
-}
 .user-dot span {
 	display: block;
 	width: 18px;
 	height: 18px;
 	border-radius: 50%;
-	background: #1d6fff;
-	border: 3px solid #fff;
-	box-shadow: 0 0 0 0 rgba(29, 111, 255, 0.5);
+	background: var(--aqua);
+	border: 3px solid var(--blue);
+	box-shadow: 0 0 0 0 rgba(0, 90, 85, 0.45);
 	animation: user-pulse 2s infinite;
 }
 @keyframes user-pulse {
 	0% {
-		box-shadow: 0 0 0 0 rgba(29, 111, 255, 0.5);
+		box-shadow: 0 0 0 0 rgba(0, 90, 85, 0.45);
 	}
 	70% {
-		box-shadow: 0 0 0 14px rgba(29, 111, 255, 0);
+		box-shadow: 0 0 0 14px rgba(0, 90, 85, 0);
 	}
 	100% {
-		box-shadow: 0 0 0 0 rgba(29, 111, 255, 0);
+		box-shadow: 0 0 0 0 rgba(0, 90, 85, 0);
 	}
 }
 
@@ -248,9 +287,10 @@ textarea {
 	width: 100%;
 	padding: 10px 12px;
 	border: 1px solid var(--line);
-	border-radius: 10px;
-	background: #fff;
+	border-radius: 14px;
+	background: rgba(255, 250, 240, 0.94);
 	color: var(--ink);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 textarea {
 	resize: vertical;
@@ -258,8 +298,9 @@ textarea {
 }
 label {
 	display: block;
-	font-size: 13px;
-	font-weight: 600;
+	font-size: 12px;
+	font-weight: 740;
 	color: var(--muted);
 	margin-bottom: 6px;
+	letter-spacing: 0.02em;
 }
