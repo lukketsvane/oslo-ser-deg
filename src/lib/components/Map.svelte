@@ -62,10 +62,9 @@
 
 	function iconFor(camera: Camera): DivIcon {
 		const color = colorFor(camera.kamerastatus);
-		const ring =
-			camera.kamerastatus === 'Stadfesta' ? 'box-shadow:0 0 0 4px rgba(29,111,255,.25);' : '';
-		const html = `<span style="display:block;width:16px;height:16px;border-radius:50%;background:${color};border:2px solid #fff;${ring}"></span>`;
-		return L!.divIcon({ html, className: 'cctv-marker', iconSize: [20, 20], iconAnchor: [10, 10] });
+		const selected = camera.id === selectedId ? ' selected' : '';
+		const html = `<span class="pin${selected}" style="--c:${color}"><i></i></span>`;
+		return L!.divIcon({ html, className: 'cctv-marker', iconSize: [24, 24], iconAnchor: [12, 12] });
 	}
 
 	function clusterIcon(c: { getAllChildMarkers: () => Marker[]; getChildCount: () => number }): DivIcon {
@@ -171,8 +170,12 @@
 	});
 
 	$effect(() => {
-		const m = selectedId ? markerById.get(selectedId) : undefined;
-		m?.setZIndexOffset(1000);
+		selectedId;
+		for (const cam of cameras) {
+			const marker = markerById.get(cam.id);
+			if (marker) marker.setIcon(iconFor(cam));
+			marker?.setZIndexOffset(cam.id === selectedId ? 1000 : 0);
+		}
 	});
 
 	function startWatch() {
@@ -194,10 +197,10 @@
 					}).addTo(map);
 					accuracyCircle = L.circle(ll, {
 						radius: acc,
-						color: '#1d6fff',
+						color: '#005a55',
 						weight: 1,
-						fillColor: '#1d6fff',
-						fillOpacity: 0.1
+						fillColor: '#b9f1ef',
+						fillOpacity: 0.16
 					}).addTo(map);
 				} else {
 					userMarker.setLatLng(ll);
@@ -219,11 +222,11 @@
 	{#if adjustMode}
 		<div class="crosshair" aria-hidden="true">
 			<svg viewBox="0 0 48 48" width="48" height="48">
-				<circle cx="24" cy="24" r="9" fill="#1d6fff" stroke="#fff" stroke-width="3" />
-				<line x1="24" y1="0" x2="24" y2="14" stroke="#1d6fff" stroke-width="2" />
-				<line x1="24" y1="34" x2="24" y2="48" stroke="#1d6fff" stroke-width="2" />
-				<line x1="0" y1="24" x2="14" y2="24" stroke="#1d6fff" stroke-width="2" />
-				<line x1="34" y1="24" x2="48" y2="24" stroke="#1d6fff" stroke-width="2" />
+				<circle cx="24" cy="24" r="9" fill="#005a55" stroke="#fffaf0" stroke-width="3" />
+				<line x1="24" y1="0" x2="24" y2="14" stroke="#005a55" stroke-width="2" />
+				<line x1="24" y1="34" x2="24" y2="48" stroke="#005a55" stroke-width="2" />
+				<line x1="0" y1="24" x2="14" y2="24" stroke="#005a55" stroke-width="2" />
+				<line x1="34" y1="24" x2="48" y2="24" stroke="#005a55" stroke-width="2" />
 			</svg>
 		</div>
 	{/if}
@@ -233,11 +236,36 @@
 	.map-wrap {
 		position: absolute;
 		inset: 0;
+		background: var(--bg);
 	}
 	.map {
 		position: absolute;
 		inset: 0;
 		z-index: 0;
+	}
+	.map :global(.leaflet-tile) {
+		filter: saturate(0.58) contrast(0.92) brightness(1.05);
+	}
+	.map :global(.leaflet-control-zoom) {
+		margin-right: 14px;
+		margin-bottom: 126px;
+		border: 1px solid var(--line);
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow: var(--shadow-soft);
+	}
+	.map :global(.leaflet-control-zoom a) {
+		width: 36px;
+		height: 36px;
+		line-height: 35px;
+		border: none;
+		color: var(--ink);
+		background: rgba(255, 250, 240, 0.9);
+	}
+	.map :global(.leaflet-control-attribution) {
+		font-size: 9px;
+		background: rgba(255, 250, 240, 0.72);
+		color: var(--muted);
 	}
 	.crosshair {
 		position: absolute;
@@ -246,5 +274,6 @@
 		transform: translate(-50%, -50%);
 		z-index: 500;
 		pointer-events: none;
+		drop-shadow: 0 8px 24px rgba(2, 40, 38, 0.22);
 	}
 </style>
