@@ -227,7 +227,7 @@
 		<div class="toast">{toast}</div>
 	{/if}
 
-	<BottomSheet bind:snap peekPx={116}>
+	<BottomSheet bind:snap peekPx={98}>
 		{#if mode === 'detail' && selected}
 			<button class="close" onclick={close} aria-label="Lukk">✕</button>
 			<CameraDetail
@@ -247,17 +247,21 @@
 			<div class="action-card">
 				<h2>Juster plassering</h2>
 				<p class="muted">Flytt kartet til kameraet står nøyaktig under krysshåret.</p>
-				<button class="btn" disabled={busy} onclick={saveMove}>
-					{busy ? 'Lagrar…' : 'Lagre endring'}
-				</button>
-				<button class="btn btn-ghost" onclick={() => (mode = 'detail')}>Tilbake</button>
+				<div class="btn-row">
+					<button class="btn btn-sm btn-secondary" onclick={() => (mode = 'detail')}>Tilbake</button>
+					<button class="btn btn-sm" disabled={busy} onclick={saveMove}>
+						{busy ? 'Lagrar…' : 'Lagre'}
+					</button>
+				</div>
 			</div>
 		{:else if mode === 'place-new'}
 			<div class="action-card">
 				<h2>Plasser nytt punkt</h2>
 				<p class="muted">Flytt kartet slik at krysshåret står på kameraet.</p>
-				<button class="btn" onclick={confirmPlacement}>Set punkt her</button>
-				<button class="btn btn-ghost" onclick={close}>Avbryt</button>
+				<div class="btn-row">
+					<button class="btn btn-sm btn-secondary" onclick={close}>Avbryt</button>
+					<button class="btn btn-sm" onclick={confirmPlacement}>Set punkt her</button>
+				</div>
 			</div>
 		{:else if mode === 'add-form'}
 			<AddCameraForm
@@ -280,14 +284,15 @@
 					<div class="legend">
 						<span><i class="d blue"></i>{counts.bekrefta}</span>
 						<span><i class="d violet"></i>{counts.estimat}</span>
+						<span><i class="d grey"></i>{counts.oppdrag}</span>
 					</div>
 				</div>
 				{#if tab === 'Oppdrag'}
-					<button class="btn" onclick={() => (snap = 'half')}>
+					<button class="btn btn-sm" onclick={() => (snap = 'half')}>
 						⊙ Start oppdrag ({counts.oppdrag})
 					</button>
 				{:else}
-					<button class="btn" onclick={startPlaceNew}>＋ Legg til kamera</button>
+					<button class="btn btn-sm" onclick={startPlaceNew}>＋ Legg til kamera</button>
 				{/if}
 			</div>
 		{:else}
@@ -383,7 +388,7 @@
 
 	.peek {
 		display: grid;
-		gap: 10px;
+		gap: 8px;
 	}
 	.peek-row {
 		display: flex;
@@ -423,6 +428,9 @@
 	}
 	.d.violet {
 		background: var(--violet);
+	}
+	.d.grey {
+		background: #9aa3b2;
 	}
 	.sheet-head {
 		display: flex;

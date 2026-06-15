@@ -43,11 +43,15 @@
 	<textarea id="note" bind:value={note} maxlength="200" placeholder="Skriv kva du ser eller veit…"
 	></textarea>
 
-	<div class="actions">
-		<button class="btn" disabled={busy} onclick={() => onsubmit?.({ confirm, confidence, note })}>
-			{busy ? 'Sender…' : `Send stadfesting (+${reward})`}
+	<div class="btn-row actions">
+		<button class="btn btn-sm btn-secondary" onclick={() => oncancel?.()}>Tilbake</button>
+		<button
+			class="btn btn-sm"
+			disabled={busy}
+			onclick={() => onsubmit?.({ confirm, confidence, note })}
+		>
+			{busy ? 'Sender…' : `Send (+${reward})`}
 		</button>
-		<button class="btn btn-ghost" onclick={() => oncancel?.()}>Tilbake</button>
 	</div>
 </div>
 
@@ -88,8 +92,6 @@
 		justify-content: center;
 	}
 	.actions {
-		margin-top: 16px;
-		display: grid;
-		gap: 8px;
+		margin-top: 14px;
 	}
 </style>

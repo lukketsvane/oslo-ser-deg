@@ -29,18 +29,21 @@
 </script>
 
 <ul class="list">
-	{#each ranked as { cam, dist } (cam.id)}
+	{#each ranked as { cam, dist }, i (cam.id)}
 		<li>
 			<button class="row" onclick={() => onselect?.(cam)}>
-				<span class="dot" style="background:{colorFor(cam.kamerastatus)}"></span>
+				<span class="badge" style="background:{colorFor(cam.kamerastatus)}">{i + 1}</span>
 				<span class="meta">
 					<span class="name">{cam.namn}</span>
 					<span class="sub">
-						{cam.kategori ?? 'Ukjend'}
-						{#if dist != null}· {formatDistance(dist)}{/if}
-						{#if cam.kamerastatus === 'Estimert'}· Ubekrefta{/if}
+						{cam.kategori ?? 'Ukjend'}{#if dist != null} · {formatDistance(dist)}{/if}
 					</span>
 				</span>
+				{#if cam.kamerastatus === 'Estimert'}
+					<span class="tag tag-grey">Ubekrefta</span>
+				{:else if cam.kamerastatus === 'Ukjent'}
+					<span class="tag tag-warn">Treng justering</span>
+				{/if}
 				<span class="reward">+{EYEBALL_REWARD.confirm}</span>
 			</button>
 		</li>
@@ -60,19 +63,25 @@
 	.row {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
 		width: 100%;
 		background: transparent;
 		border: none;
-		padding: 10px 4px;
+		padding: 8px 4px;
 		text-align: left;
 		border-bottom: 1px solid var(--line);
 	}
-	.dot {
-		width: 12px;
-		height: 12px;
+	.badge {
+		width: 24px;
+		height: 24px;
 		border-radius: 50%;
 		flex: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		font-size: 12px;
+		font-weight: 700;
 	}
 	.meta {
 		flex: 1;

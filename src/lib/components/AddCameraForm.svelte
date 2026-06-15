@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { KATEGORIAR, type Kategori } from '$lib/types';
+	import type { Kategori } from '$lib/types';
 	import Autocomplete from './Autocomplete.svelte';
 	import type { GeocodeHit } from '../../routes/api/geocode/+server';
 
@@ -17,74 +17,103 @@
 	let kategori = $state<Kategori>('CCTV / kamera');
 	let confirm = $state(false);
 
+	// quick-pick chips mapped to real KATEGORIAR values
+	const quickCats: { label: string; value: Kategori }[] = [
+		{ label: 'Skule', value: 'Skule' },
+		{ label: 'Butikk', value: 'Kjøpesenter / næring' },
+		{ label: 'Kollektiv', value: 'Buss' },
+		{ label: 'Anna', value: 'Ukjend kameratype' }
+	];
+
 	const valid = $derived(namn.trim().length > 0);
 </script>
 
 <div class="form">
-	<h2>Nytt kamerapunkt</h2>
-	<p class="sub">Søk opp staden, eller flytt krysshåret på kartet.</p>
+	<h2>Legg til kamera</h2>
 
-	<label for="namn">Namn / stad</label>
-	<Autocomplete
-		bind:value={namn}
-		placeholder="t.d. Fresh Fitness St. Hanshaugen"
-		onselect={(hit) => {
-			namn = hit.namn;
-			ongeocode?.(hit);
-		}}
-	/>
+	<div class="seg">
+		<button class="chip" class:active={confirm} onclick={() => (confirm = true)}>
+			<span class="cdot blue"></span>Bekrefta
+		</button>
+		<button class="chip" class:active={!confirm} onclick={() => (confirm = false)}>
+			<span class="cdot violet"></span>Estimat
+		</button>
+	</div>
 
-	<label for="kat">Kategori</label>
-	<select id="kat" bind:value={kategori}>
-		{#each KATEGORIAR as k}<option value={k}>{k}</option>{/each}
-	</select>
+	<div class="cats">
+		{#each quickCats as c}
+			<button class="chip" class:active={kategori === c.value} onclick={() => (kategori = c.value)}>
+				{c.label}
+			</button>
+		{/each}
+	</div>
 
-	<label class="check">
-		<input type="checkbox" bind:checked={confirm} class="cb" />
-		Eg har sett kameraet sjølv (stadfesta) — elles vert det lagt som estimat
-	</label>
+	<div class="namn-field">
+		<span class="pin">📍</span>
+		<Autocomplete
+			bind:value={namn}
+			placeholder="Namn på stad"
+			onselect={(hit) => {
+				namn = hit.namn;
+				ongeocode?.(hit);
+			}}
+		/>
+	</div>
+	<p class="hint">Juster sehøgda — flytt krysshåret på kartet.</p>
 
-	<div class="actions">
+	<div class="btn-row actions">
+		<button class="btn btn-sm btn-secondary" onclick={() => oncancel?.()}>Avbryt</button>
 		<button
-			class="btn"
+			class="btn btn-sm"
 			disabled={!valid || busy}
 			onclick={() => onsubmit?.({ namn: namn.trim(), kategori, confirm })}
 		>
-			{busy ? 'Lagrar…' : 'Legg til punkt'}
+			{busy ? 'Lagrar…' : 'Lagre'}
 		</button>
-		<button class="btn btn-ghost" onclick={() => oncancel?.()}>Avbryt</button>
 	</div>
 </div>
 
 <style>
 	h2 {
-		margin: 0 0 4px;
-		font-size: 19px;
+		margin: 0 0 12px;
+		font-size: 18px;
 	}
-	.sub {
-		color: var(--muted);
-		font-size: 14px;
-		margin: 0 0 14px;
-	}
-	label {
-		margin-top: 12px;
-	}
-	.check {
-		display: flex;
+	.seg {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: 8px;
-		align-items: flex-start;
-		font-size: 13px;
-		color: var(--ink);
-		font-weight: 500;
-		margin-top: 16px;
+		margin-bottom: 8px;
 	}
-	.cb {
-		width: auto;
-		margin-top: 2px;
+	.seg .chip {
+		justify-content: center;
+	}
+	.cats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 12px;
+	}
+	.namn-field {
+		position: relative;
+	}
+	.pin {
+		position: absolute;
+		left: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 1;
+		font-size: 14px;
+		pointer-events: none;
+	}
+	.namn-field :global(input) {
+		padding-left: 34px;
+	}
+	.hint {
+		margin: 6px 0 0;
+		font-size: 11px;
+		color: var(--muted);
 	}
 	.actions {
-		margin-top: 18px;
-		display: grid;
-		gap: 8px;
+		margin-top: 14px;
 	}
 </style>
