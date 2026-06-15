@@ -129,5 +129,7 @@
 	}
 	.content.scroll {
 		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
 	}
 </style>

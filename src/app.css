@@ -24,11 +24,43 @@ body {
 	color: var(--ink);
 	background: var(--bg);
 	-webkit-font-smoothing: antialiased;
+	/* native feel: no rubber-band scroll, no tap flash, no long-press callout */
+	overscroll-behavior: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+	touch-action: manipulation;
+}
+
+/* let people select/edit inside real inputs */
+input,
+textarea {
+	-webkit-user-select: text;
+	user-select: text;
 }
 
 button {
 	font: inherit;
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+}
+/* tactile press */
+.btn,
+.chip,
+.fab,
+.eyeballs {
+	transition:
+		transform 0.08s ease,
+		background 0.15s ease,
+		opacity 0.15s ease;
+}
+.btn:active,
+.chip:active,
+.fab:active,
+.eyeballs:active {
+	transform: scale(0.96);
 }
 
 .btn {
