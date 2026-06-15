@@ -19,7 +19,7 @@
 
 	function snapPx(s: Snap): number {
 		if (s === 'peek') return peekPx;
-		if (s === 'half') return Math.round(vh * 0.5);
+		if (s === 'half') return Math.round(vh * 0.48);
 		return Math.round(vh * 0.86);
 	}
 	const heightPx = $derived(dragging && liveH != null ? liveH : snapPx(snap));
@@ -37,7 +37,7 @@
 	function move(e: PointerEvent) {
 		if (!dragging) return;
 		const dy = startY - e.clientY; // drag up → positive → taller
-		const min = ondismiss ? 0 : peekPx - 50;
+		const min = ondismiss ? 0 : peekPx - 42;
 		liveH = Math.max(min, Math.min(vh * 0.92, startH + dy));
 	}
 	function up() {
@@ -97,24 +97,27 @@
 <style>
 	.sheet {
 		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
+		left: 8px;
+		right: 8px;
+		bottom: 8px;
 		z-index: 600;
 		display: flex;
 		flex-direction: column;
 		background: var(--panel);
-		border-radius: 22px 22px 0 0;
+		border: 1px solid rgba(6, 63, 61, 0.12);
+		border-radius: 26px;
 		box-shadow: var(--shadow);
 		transition: height 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
 		touch-action: none;
+		backdrop-filter: blur(22px) saturate(1.2);
+		overflow: hidden;
 	}
 	.sheet.dragging {
 		transition: none;
 	}
 	.handle-area {
 		flex: none;
-		padding: 10px 0 6px;
+		padding: 9px 0 5px;
 		display: flex;
 		justify-content: center;
 		cursor: grab;
@@ -124,16 +127,16 @@
 		cursor: grabbing;
 	}
 	.grab {
-		width: 40px;
+		width: 38px;
 		height: 4px;
 		border-radius: 999px;
-		background: #d6dae2;
+		background: rgba(6, 63, 61, 0.2);
 	}
 	.content {
 		flex: 1;
 		min-height: 0;
 		overflow: hidden;
-		padding: 0 18px calc(env(safe-area-inset-bottom) + 18px);
+		padding: 0 14px calc(env(safe-area-inset-bottom) + 14px);
 	}
 	.content.scroll {
 		overflow-y: auto;
