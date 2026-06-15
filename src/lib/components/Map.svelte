@@ -20,10 +20,18 @@
 		adjustMode?: boolean;
 		onselect?: (camera: Camera) => void;
 		onuserlocation?: (latlng: LatLng) => void;
+		/** Tap on the map background (not a marker). */
+		onbackground?: () => void;
 	}
 
-	let { cameras, selectedId = null, adjustMode = false, onselect, onuserlocation }: Props =
-		$props();
+	let {
+		cameras,
+		selectedId = null,
+		adjustMode = false,
+		onselect,
+		onuserlocation,
+		onbackground
+	}: Props = $props();
 
 	const OSLO: [number, number] = [59.9139, 10.7522];
 
@@ -98,6 +106,7 @@
 				iconCreateFunction: clusterIcon
 			});
 			map.addLayer(cluster);
+			map.on('click', () => onbackground?.());
 			syncMarkers();
 		})();
 		return () => {

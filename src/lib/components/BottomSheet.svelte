@@ -7,9 +7,11 @@
 	interface Props {
 		snap?: Snap;
 		peekPx?: number;
+		/** When set, dragging the sheet below the peek height dismisses it instead of snapping. */
+		ondismiss?: () => void;
 		children: Snippet;
 	}
-	let { snap = $bindable('peek'), peekPx = 140, children }: Props = $props();
+	let { snap = $bindable('peek'), peekPx = 140, ondismiss, children }: Props = $props();
 
 	let vh = $state(browser ? window.innerHeight : 800);
 	let dragging = $state(false);
@@ -35,17 +37,23 @@
 	function move(e: PointerEvent) {
 		if (!dragging) return;
 		const dy = startY - e.clientY; // drag up → positive → taller
-		liveH = Math.max(peekPx - 50, Math.min(vh * 0.92, startH + dy));
+		const min = ondismiss ? 0 : peekPx - 50;
+		liveH = Math.max(min, Math.min(vh * 0.92, startH + dy));
 	}
 	function up() {
 		if (!dragging) return;
 		dragging = false;
 		const target = liveH ?? snapPx(snap);
+		liveH = null;
+		// dragged well below peek → dismiss instead of snapping back
+		if (ondismiss && target < peekPx * 0.6) {
+			ondismiss();
+			return;
+		}
 		const cands: Snap[] = ['peek', 'half', 'full'];
 		snap = cands.reduce((best, s) =>
 			Math.abs(snapPx(s) - target) < Math.abs(snapPx(best) - target) ? s : best
 		);
-		liveH = null;
 	}
 	function toggle() {
 		// tap the handle: cycle peek → half → peek

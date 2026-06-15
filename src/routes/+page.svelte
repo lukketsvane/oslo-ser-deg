@@ -197,10 +197,11 @@
 		adjustMode={adjusting}
 		onselect={openCamera}
 		onuserlocation={(ll) => (userLatLng = { lat: ll.lat, lng: ll.lng })}
+		onbackground={() => mode === 'detail' && close()}
 	/>
 
 	<div class="topbar">
-		<div class="brand">cctv.oslo.no</div>
+		<div class="brand">OsloSerDeg</div>
 		<EyeballCounter onclick={() => (authOpen = true)} />
 	</div>
 
@@ -227,9 +228,17 @@
 		<div class="toast">{toast}</div>
 	{/if}
 
-	<BottomSheet bind:snap peekPx={98}>
+	<BottomSheet
+		bind:snap
+		peekPx={98}
+		ondismiss={mode === 'detail' || mode === 'contribute' ? close : undefined}
+	>
 		{#if mode === 'detail' && selected}
-			<button class="close" onclick={close} aria-label="Lukk">✕</button>
+			<div class="detail-top">
+				<button class="back" onclick={close}>
+					<span class="chev">‹</span> Kart
+				</button>
+			</div>
 			<CameraDetail
 				camera={selected}
 				onconfirm={() => (mode = 'contribute')}
@@ -246,7 +255,7 @@
 		{:else if mode === 'adjust-move'}
 			<div class="action-card">
 				<h2>Juster plassering</h2>
-				<p class="muted">Flytt kartet til kameraet står nøyaktig under krysshåret.</p>
+				<p class="muted">Flytt kartet så krysshåret står på kameraet.</p>
 				<div class="btn-row">
 					<button class="btn btn-sm btn-secondary" onclick={() => (mode = 'detail')}>Tilbake</button>
 					<button class="btn btn-sm" disabled={busy} onclick={saveMove}>
@@ -257,7 +266,7 @@
 		{:else if mode === 'place-new'}
 			<div class="action-card">
 				<h2>Plasser nytt punkt</h2>
-				<p class="muted">Flytt kartet slik at krysshåret står på kameraet.</p>
+				<p class="muted">Flytt kartet så krysshåret står på kameraet.</p>
 				<div class="btn-row">
 					<button class="btn btn-sm btn-secondary" onclick={close}>Avbryt</button>
 					<button class="btn btn-sm" onclick={confirmPlacement}>Set punkt her</button>
@@ -279,7 +288,7 @@
 				<div class="peek-row">
 					<div>
 						<strong>{tab === 'Oppdrag' ? 'Oppdrag nær deg' : 'Kartlagde kamera'}</strong>
-						<p class="hint">Trykk på eit punkt, eller dra opp for liste</p>
+						<p class="hint">Trykk eit punkt · dra opp for liste</p>
 					</div>
 					<div class="legend">
 						<span><i class="d blue"></i>{counts.bekrefta}</span>
@@ -452,17 +461,26 @@
 	.add-inline {
 		margin-top: 14px;
 	}
-	.close {
-		position: absolute;
-		top: 12px;
-		right: 14px;
-		z-index: 2;
+	.detail-top {
+		margin: -2px 0 10px;
+	}
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		min-height: 36px;
+		padding: 6px 12px 6px 8px;
 		border: none;
+		border-radius: 999px;
 		background: #f1f4f9;
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
+		color: var(--ink);
 		font-size: 14px;
+		font-weight: 600;
+	}
+	.back .chev {
+		font-size: 19px;
+		line-height: 1;
+		margin-top: -1px;
 	}
 	.action-card {
 		display: grid;

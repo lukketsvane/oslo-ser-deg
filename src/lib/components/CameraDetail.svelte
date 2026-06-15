@@ -25,14 +25,14 @@
 
 	<div class="summary">
 		<span class="sum-text"
-			>{camera.stadfestingar} stadfesting{camera.stadfestingar === 1 ? '' : 'ar'} · {semje}% semje</span
+			>{camera.stadfestingar} stadfesting{camera.stadfestingar === 1 ? '' : 'ar'}</span
 		>
 		<div class="bar"><span style="width:{semje}%"></span></div>
-		<span class="pct">{semje}%</span>
+		<span class="pct">{semje}% semje</span>
 	</div>
 
 	{#if isEstimat}
-		<p class="note">👁 Kan eksistere her — fellesskapet meiner det sannsynlegvis er her.</p>
+		<p class="note">👁 Truleg her — meld inn om du veit meir.</p>
 	{/if}
 
 	<div class="bento">
@@ -110,6 +110,7 @@
 		font-size: 12px;
 		font-weight: 700;
 		color: var(--violet);
+		white-space: nowrap;
 	}
 	.note {
 		background: #f6f3ff;
