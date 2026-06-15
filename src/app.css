@@ -1,20 +1,22 @@
 :root {
-	--bg: #eef8f6;
-	--panel: rgba(255, 252, 244, 0.94);
-	--panel-solid: #fffaf0;
-	--ink: #063f3d;
-	--muted: #667b78;
-	--line: rgba(6, 63, 61, 0.12);
-	--blue: #005a55;
-	--violet: #ff736d;
-	--green: #00866d;
-	--aqua: #b9f1ef;
-	--sand: #e4d4c3;
+	--bg: #f7faf9;
+	--panel: rgba(255, 255, 255, 0.92);
+	--panel-solid: #ffffff;
+	--paper: #fff7e8;
+	--ink: #0f172a;
+	--muted: #6b7280;
+	--line: rgba(15, 23, 42, 0.1);
+	--blue: #2374f6;
+	--violet: #a855f7;
+	--green: #10b981;
+	--aqua: #9ee7ee;
+	--mint: #bdeccf;
+	--sand: #e8dccb;
 	--coral: #ff736d;
 	--mustard: #ffc75e;
 	--radius: 18px;
-	--shadow: 0 14px 45px rgba(2, 40, 38, 0.18);
-	--shadow-soft: 0 8px 24px rgba(2, 40, 38, 0.12);
+	--shadow: 0 18px 48px rgba(15, 23, 42, 0.15);
+	--shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.11);
 }
 
 * {
@@ -78,15 +80,15 @@ button {
 	justify-content: center;
 	gap: 8px;
 	width: 100%;
-	padding: 13px 16px;
+	padding: 12px 15px;
 	border: none;
-	border-radius: 999px;
+	border-radius: 18px;
 	background: var(--blue);
-	color: #fffaf0;
-	font-weight: 720;
+	color: white;
+	font-weight: 800;
 	font-size: 14px;
 	letter-spacing: -0.01em;
-	box-shadow: 0 8px 20px rgba(0, 90, 85, 0.22);
+	box-shadow: 0 8px 20px rgba(35, 116, 246, 0.23);
 }
 .btn:disabled {
 	opacity: 0.55;
@@ -98,19 +100,19 @@ button {
 	box-shadow: none;
 }
 .btn-secondary {
-	background: rgba(255, 250, 240, 0.82);
+	background: rgba(255, 255, 255, 0.84);
 	color: var(--ink);
 	border: 1px solid var(--line);
 	box-shadow: none;
 }
 .btn-sm {
-	padding: 10px 13px;
+	padding: 11px 13px;
 	font-size: 13px;
 }
 .btn-row {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 8px;
+	gap: 9px;
 }
 
 .bento {
@@ -119,26 +121,23 @@ button {
 	gap: 8px;
 }
 .bento-cell {
-	background: rgba(255, 255, 255, 0.68);
+	background: rgba(15, 23, 42, 0.04);
 	border: 1px solid var(--line);
 	border-radius: 16px;
 	padding: 10px 11px;
 	min-width: 0;
-	box-shadow: inset 0 -1px 0 rgba(6, 63, 61, 0.04);
 }
 .bento-cell .k {
 	display: block;
-	font-size: 10px;
-	font-weight: 700;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 720;
 	color: var(--muted);
 	margin-bottom: 3px;
 }
 .bento-cell .v {
 	display: block;
 	font-size: 14px;
-	font-weight: 720;
+	font-weight: 780;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -150,7 +149,7 @@ button {
 	display: inline-flex;
 	align-items: center;
 	font-size: 10px;
-	font-weight: 740;
+	font-weight: 760;
 	line-height: 1;
 	padding: 4px 8px;
 	border-radius: 999px;
@@ -158,16 +157,16 @@ button {
 	letter-spacing: 0.02em;
 }
 .tag-grey {
-	background: rgba(0, 90, 85, 0.08);
-	color: var(--blue);
+	background: rgba(15, 23, 42, 0.06);
+	color: var(--ink);
 }
 .tag-warn {
-	background: rgba(255, 199, 94, 0.28);
-	color: #7a5600;
+	background: rgba(168, 85, 247, 0.1);
+	color: #7c3aed;
 }
 .tag-ok {
-	background: rgba(0, 134, 109, 0.12);
-	color: var(--green);
+	background: rgba(35, 116, 246, 0.1);
+	color: var(--blue);
 }
 
 .cdot {
@@ -184,27 +183,27 @@ button {
 	background: var(--violet);
 }
 .cdot.grey {
-	background: #9aa8a5;
+	background: #9aa3af;
 }
 
 .chip {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	padding: 7px 12px;
+	padding: 8px 12px;
 	border-radius: 999px;
-	border: 1px solid rgba(6, 63, 61, 0.14);
-	background: rgba(255, 250, 240, 0.82);
-	backdrop-filter: blur(14px);
-	font-size: 12px;
-	font-weight: 700;
+	border: 1px solid var(--line);
+	background: rgba(255, 255, 255, 0.82);
+	backdrop-filter: blur(16px) saturate(1.15);
+	font-size: 13px;
+	font-weight: 780;
 	color: var(--ink);
-	box-shadow: 0 5px 18px rgba(2, 40, 38, 0.1);
+	box-shadow: var(--shadow-soft);
 }
 .chip.active {
-	border-color: rgba(0, 90, 85, 0.28);
-	color: #fffaf0;
-	background: rgba(0, 90, 85, 0.92);
+	border-color: rgba(168, 85, 247, 0.25);
+	color: var(--violet);
+	background: rgba(255, 255, 255, 0.94);
 }
 
 .cctv-marker,
@@ -214,33 +213,36 @@ button {
 	border: none;
 }
 .cctv-marker .pin {
+	position: relative;
 	display: grid;
 	place-items: center;
 	width: 24px;
 	height: 24px;
 	border-radius: 999px;
-	background: color-mix(in srgb, var(--c) 88%, white);
-	border: 2px solid #fffaf0;
-	box-shadow: 0 3px 12px rgba(2, 40, 38, 0.28);
+	background: color-mix(in srgb, var(--c) 92%, white);
+	border: 3px solid white;
+	box-shadow:
+		0 5px 14px rgba(15, 23, 42, 0.25),
+		0 0 0 1px rgba(15, 23, 42, 0.08);
 }
 .cctv-marker .pin::before {
 	content: '';
 	width: 13px;
 	height: 7px;
 	border-radius: 999px 999px 48% 48%;
-	background: #fffaf0;
+	background: white;
 }
 .cctv-marker .pin i {
 	position: absolute;
-	width: 6px;
-	height: 6px;
+	width: 5px;
+	height: 5px;
 	border-radius: 50%;
-	background: #003f3b;
+	background: #0f172a;
 }
 .cctv-marker .pin.selected {
 	box-shadow:
-		0 0 0 5px rgba(185, 241, 239, 0.72),
-		0 8px 24px rgba(2, 40, 38, 0.35);
+		0 0 0 6px color-mix(in srgb, var(--c) 22%, transparent),
+		0 8px 26px rgba(15, 23, 42, 0.32);
 }
 
 .cctv-cluster .cl {
@@ -248,14 +250,12 @@ button {
 	align-items: center;
 	justify-content: center;
 	border-radius: 50%;
-	background:
-		linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent),
-		var(--c);
-	color: #fffaf0;
-	font-weight: 800;
+	background: var(--c);
+	color: white;
+	font-weight: 850;
 	font-size: 13px;
-	border: 2px solid #fffaf0;
-	box-shadow: 0 5px 18px rgba(2, 40, 38, 0.32);
+	border: 3px solid white;
+	box-shadow: 0 6px 18px rgba(15, 23, 42, 0.3);
 }
 
 .user-dot span {
@@ -263,20 +263,20 @@ button {
 	width: 18px;
 	height: 18px;
 	border-radius: 50%;
-	background: var(--aqua);
-	border: 3px solid var(--blue);
-	box-shadow: 0 0 0 0 rgba(0, 90, 85, 0.45);
+	background: white;
+	border: 5px solid var(--blue);
+	box-shadow: 0 0 0 0 rgba(35, 116, 246, 0.45);
 	animation: user-pulse 2s infinite;
 }
 @keyframes user-pulse {
 	0% {
-		box-shadow: 0 0 0 0 rgba(0, 90, 85, 0.45);
+		box-shadow: 0 0 0 0 rgba(35, 116, 246, 0.45);
 	}
 	70% {
-		box-shadow: 0 0 0 14px rgba(0, 90, 85, 0);
+		box-shadow: 0 0 0 14px rgba(35, 116, 246, 0);
 	}
 	100% {
-		box-shadow: 0 0 0 0 rgba(0, 90, 85, 0);
+		box-shadow: 0 0 0 0 rgba(35, 116, 246, 0);
 	}
 }
 
@@ -288,7 +288,7 @@ textarea {
 	padding: 10px 12px;
 	border: 1px solid var(--line);
 	border-radius: 14px;
-	background: rgba(255, 250, 240, 0.94);
+	background: rgba(255, 255, 255, 0.94);
 	color: var(--ink);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
@@ -299,8 +299,8 @@ textarea {
 label {
 	display: block;
 	font-size: 12px;
-	font-weight: 740;
+	font-weight: 760;
 	color: var(--muted);
 	margin-bottom: 6px;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.01em;
 }
