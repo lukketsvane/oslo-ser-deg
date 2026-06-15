@@ -12,6 +12,7 @@ export interface Identity {
 }
 
 const KEY = 'cctv-oslo-identity';
+const ACCOUNT_KEY = 'cctv-oslo-account';
 
 const ADJ = ['taste', 'kr4', 'natt', 'gate', 'skygge', 'lyn', 'kald', 'stille', 'rapp', 'tåke'];
 const NOUN = ['finger', 'vler', 'ugle', 'rev', 'måke', 'katt', 'ravn', 'mus', 'ulv', 'hauk'];
@@ -43,14 +44,49 @@ function loadAnon(): Identity {
 	return fresh;
 }
 
+/** Last known logged-in account, cached so the UI restores instantly on reload
+ *  (and survives a slow/offline /api/auth/me) until the server says otherwise. */
+function loadCachedAccount(): Identity | null {
+	if (!browser) return null;
+	try {
+		const raw = localStorage.getItem(ACCOUNT_KEY);
+		if (raw) return { ...(JSON.parse(raw) as Identity), account: true };
+	} catch {
+		/* ignore */
+	}
+	return null;
+}
+
+/** Initial identity: prefer a cached account, else the anon handle. */
+function loadInitial(): Identity {
+	return loadCachedAccount() ?? loadAnon();
+}
+
 function persistAnon(id: Identity) {
-	if (browser && !id.account) localStorage.setItem(KEY, JSON.stringify(id));
+	if (!browser) return;
+	if (id.account) localStorage.setItem(ACCOUNT_KEY, JSON.stringify(id));
+	else localStorage.setItem(KEY, JSON.stringify(id));
+}
+
+function cacheAccount(id: Identity) {
+	if (browser && id.account) localStorage.setItem(ACCOUNT_KEY, JSON.stringify(id));
+}
+
+function clearAccount() {
+	if (browser) localStorage.removeItem(ACCOUNT_KEY);
 }
 
 function createIdentity() {
-	const { subscribe, update, set } = writable<Identity>(loadAnon());
-	let current = loadAnon();
+	const initial = loadInitial();
+	const { subscribe, update, set } = writable<Identity>(initial);
+	let current = initial;
 	subscribe((v) => (current = v));
+
+	/** Set + persist a confirmed logged-in account. */
+	function setAccount(id: Identity) {
+		set(id);
+		cacheAccount(id);
+	}
 
 	async function refresh() {
 		if (!browser) return;
@@ -58,7 +94,7 @@ function createIdentity() {
 			const res = await fetch('/api/auth/me');
 			const data = await res.json();
 			if (data.user) {
-				set({
+				setAccount({
 					handle: data.user.handle,
 					eyeballs: data.user.eyeballs ?? 0,
 					streak: data.user.streak ?? 0,
@@ -66,10 +102,12 @@ function createIdentity() {
 					account: true
 				});
 			} else if (current.account) {
+				// Server explicitly says we're not logged in — drop the cached account.
+				clearAccount();
 				set(loadAnon());
 			}
 		} catch {
-			/* offline — keep current */
+			/* offline — keep current (cached account stays logged in) */
 		}
 	}
 
@@ -108,7 +146,7 @@ function createIdentity() {
 		async register(handle: string, password: string) {
 			const r = await post('/api/auth/register', { handle, password });
 			if (r.ok) {
-				set({
+				setAccount({
 					handle: r.data.handle,
 					eyeballs: r.data.eyeballs ?? 0,
 					streak: r.data.streak ?? 0,
@@ -121,7 +159,7 @@ function createIdentity() {
 		async login(handle: string, password: string) {
 			const r = await post('/api/auth/login', { handle, password });
 			if (r.ok) {
-				set({
+				setAccount({
 					handle: r.data.handle,
 					eyeballs: r.data.eyeballs ?? 0,
 					streak: r.data.streak ?? 0,
@@ -133,6 +171,7 @@ function createIdentity() {
 		},
 		async logout() {
 			await post('/api/auth/logout', {});
+			clearAccount();
 			set(loadAnon());
 		}
 	};

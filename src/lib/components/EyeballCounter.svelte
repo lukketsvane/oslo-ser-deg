@@ -9,12 +9,17 @@
 
 <button
 	class="eyeballs"
+	class:guest={!$identity.account}
 	onclick={() => onclick?.()}
 	title={$identity.account ? `@${$identity.handle}` : 'Logg inn / lag konto'}
 >
 	<span class="eye-mark" aria-hidden="true"><i></i></span>
-	<span class="num">{$identity.eyeballs}</span>
-	<span class="label">{$identity.account ? $identity.handle : 'eyeballs'}</span>
+	{#if $identity.account}
+		<span class="num">{$identity.eyeballs}</span>
+		<span class="label">{$identity.handle}</span>
+	{:else}
+		<span class="label">Logg inn</span>
+	{/if}
 </button>
 
 <style>
@@ -63,5 +68,9 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+	.guest .label {
+		opacity: 1;
+		font-weight: 800;
 	}
 </style>
