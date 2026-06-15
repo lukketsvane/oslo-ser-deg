@@ -21,8 +21,10 @@
 	import { identity } from '$lib/stores/identity';
 	import { EYEBALL_REWARD, type Camera, type Confidence, type Kategori } from '$lib/types';
 
-	type Mode = 'browse' | 'detail' | 'contribute' | 'adjust-move' | 'place-new' | 'add-form';
+	type Mode = 'browse' | 'detail' | 'contribute' | 'adjust-move' | 'place-new' | 'add-form' | 'info';
 	type Tab = 'Bekrefta' | 'Estimat' | 'Oppdrag';
+
+	const tabs: Tab[] = ['Bekrefta', 'Estimat', 'Oppdrag'];
 
 	let mode = $state<Mode>('browse');
 	let tab = $state<Tab>('Estimat');
@@ -54,7 +56,7 @@
 			else if (c.kamerastatus === 'Estimert') estimat++;
 			if (c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent') oppdrag++;
 		}
-		return { bekrefta, estimat, oppdrag };
+		return { bekrefta, estimat, oppdrag, totalt: $cameras.length };
 	});
 
 	const visible = $derived.by(() => {
@@ -67,6 +69,12 @@
 	function flash(msg: string) {
 		toast = msg;
 		setTimeout(() => (toast = null), 2600);
+	}
+
+	function openInfo() {
+		selected = null;
+		mode = mode === 'info' ? 'browse' : 'info';
+		snap = mode === 'info' ? 'half' : 'peek';
 	}
 
 	function openCamera(cam: Camera) {
@@ -186,22 +194,28 @@
 	}
 
 	const adjusting = $derived(mode === 'adjust-move' || mode === 'place-new');
-	const showChrome = $derived(mode === 'browse' || mode === 'detail' || mode === 'contribute');
+	const browseChrome = $derived(mode === 'browse');
 </script>
 
 <div class="app">
 	<Map
 		bind:this={mapComp}
-		cameras={showChrome ? visible : $cameras}
+		cameras={browseChrome ? visible : $cameras}
 		selectedId={selected?.id}
 		adjustMode={adjusting}
 		onselect={openCamera}
 		onuserlocation={(ll) => (userLatLng = { lat: ll.lat, lng: ll.lng })}
-		onbackground={() => mode === 'detail' && close()}
+		onbackground={() => (mode === 'detail' || mode === 'info') && close()}
 	/>
 
 	<div class="topbar">
-		<div class="brand">OsloSerDeg</div>
+		<button class="brand-btn" class:active={mode === 'info'} onclick={openInfo} aria-label="Opne info">
+			<span class="logo-mark" aria-hidden="true"></span>
+			<span class="brand-copy">
+				<strong>OsloSerDeg</strong>
+				<small>overvaking.iverfinne.no</small>
+			</span>
+		</button>
 		<EyeballCounter onclick={() => (authOpen = true)} />
 	</div>
 
@@ -209,12 +223,12 @@
 		<AuthSheet onclose={() => (authOpen = false)} />
 	{/if}
 
-	{#if showChrome}
+	{#if browseChrome}
 		<div class="searchbar">
 			<Autocomplete placeholder="Søk adresse eller bedrift…" onselect={onSearchSelect} />
 		</div>
 		<div class="tabs-top">
-			{#each ['Bekrefta', 'Estimat', 'Oppdrag'] as const as t}
+			{#each tabs as t}
 				<button class="chip" class:active={tab === t} onclick={() => (tab = t)}>{t}</button>
 			{/each}
 		</div>
@@ -230,10 +244,39 @@
 
 	<BottomSheet
 		bind:snap
-		peekPx={98}
-		ondismiss={mode === 'detail' || mode === 'contribute' ? close : undefined}
+		peekPx={82}
+		ondismiss={mode === 'detail' || mode === 'contribute' || mode === 'info' ? close : undefined}
 	>
-		{#if mode === 'detail' && selected}
+		{#if mode === 'info'}
+			<div class="info-panel">
+				<header class="info-hero">
+					<span class="logo-mark logo-large" aria-hidden="true"></span>
+					<div>
+						<p class="eyebrow">ope kart · Oslo</p>
+						<h1>Oslo ser deg</h1>
+						<p class="lead">Eit ope, etterprøvbart kart over kamera og overvaking i byrommet.</p>
+					</div>
+				</header>
+
+				<div class="stats-grid">
+					<div><span>{counts.totalt}</span><small>punkt totalt</small></div>
+					<div><span>{counts.bekrefta}</span><small>stadfesta</small></div>
+					<div><span>{counts.estimat}</span><small>estimat</small></div>
+					<div><span>{counts.oppdrag}</span><small>oppdrag</small></div>
+				</div>
+
+				<div class="legend-card">
+					<p><i class="d blue"></i><span>Stadfesta kamera</span></p>
+					<p><i class="d violet"></i><span>Estimert punkt</span></p>
+					<p><i class="d grey"></i><span>Treng sjekk</span></p>
+				</div>
+
+				<div class="btn-row">
+					<button class="btn btn-sm btn-secondary" onclick={close}>Til kart</button>
+					<button class="btn btn-sm" onclick={startPlaceNew}>Legg til kamera</button>
+				</div>
+			</div>
+		{:else if mode === 'detail' && selected}
 			<div class="detail-top">
 				<button class="back" onclick={close}>
 					<span class="chev">‹</span> Kart
@@ -296,13 +339,6 @@
 						<span><i class="d grey"></i>{counts.oppdrag}</span>
 					</div>
 				</div>
-				{#if tab === 'Oppdrag'}
-					<button class="btn btn-sm" onclick={() => (snap = 'half')}>
-						⊙ Start oppdrag ({counts.oppdrag})
-					</button>
-				{:else}
-					<button class="btn btn-sm" onclick={startPlaceNew}>＋ Legg til kamera</button>
-				{/if}
 			</div>
 		{:else}
 			<div class="sheet-head">
@@ -322,7 +358,7 @@
 				/>
 			{/if}
 			{#if tab !== 'Oppdrag'}
-				<button class="btn add-inline" onclick={startPlaceNew}>＋ Legg til kamera</button>
+				<button class="btn add-inline" onclick={startPlaceNew}>Legg til kamera</button>
 			{/if}
 		{/if}
 	</BottomSheet>
@@ -343,70 +379,151 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
-		background: linear-gradient(rgba(11, 16, 32, 0.55), transparent);
+		gap: 10px;
+		padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+		background: linear-gradient(rgba(238, 248, 246, 0.96), rgba(238, 248, 246, 0.72), transparent);
 		pointer-events: none;
 	}
 	.topbar :global(*) {
 		pointer-events: auto;
 	}
-	.brand {
-		color: #fff;
-		font-weight: 700;
-		font-size: 15px;
-		text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+	.brand-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		min-width: 0;
+		border: 1px solid rgba(6, 63, 61, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 250, 240, 0.82);
+		backdrop-filter: blur(16px);
+		color: var(--ink);
+		padding: 7px 11px 7px 8px;
+		box-shadow: var(--shadow-soft);
+	}
+	.brand-btn.active {
+		background: var(--ink);
+		color: #fffaf0;
+	}
+	.logo-mark {
+		position: relative;
+		display: inline-block;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		background: conic-gradient(from 180deg, var(--coral) 0 25%, var(--mustard) 25% 50%, var(--aqua) 50% 100%);
+		box-shadow: inset 0 0 0 1px rgba(6, 63, 61, 0.1);
+		flex: none;
+		overflow: hidden;
+	}
+	.logo-mark::before {
+		content: '';
+		position: absolute;
+		left: 3px;
+		right: 3px;
+		top: 9px;
+		height: 10px;
+		border-radius: 999px 999px 55% 55%;
+		background: #fffaf0;
+	}
+	.logo-mark::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--ink);
+		transform: translate(-50%, -50%);
+		box-shadow: 3px -3px 0 -1px #fffaf0;
+	}
+	.logo-large {
+		width: 54px;
+		height: 54px;
+	}
+	.logo-large::before {
+		left: 6px;
+		right: 6px;
+		top: 18px;
+		height: 18px;
+	}
+	.logo-large::after {
+		width: 19px;
+		height: 19px;
+		box-shadow: 6px -6px 0 -2px #fffaf0;
+	}
+	.brand-copy {
+		display: grid;
+		line-height: 1.05;
+		text-align: left;
+		min-width: 0;
+	}
+	.brand-copy strong {
+		font-size: 14px;
+		font-weight: 800;
+		letter-spacing: -0.02em;
+	}
+	.brand-copy small {
+		font-size: 10px;
+		color: currentColor;
+		opacity: 0.62;
+		white-space: nowrap;
 	}
 	.searchbar {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 44px);
+		top: calc(env(safe-area-inset-top) + 58px);
 		left: 12px;
 		right: 12px;
 		z-index: 650;
 	}
 	.searchbar :global(input) {
 		border-radius: 999px;
-		box-shadow: var(--shadow);
-		border-color: transparent;
+		box-shadow: var(--shadow-soft);
+		border-color: rgba(6, 63, 61, 0.12);
 		padding: 11px 16px;
+		background: rgba(255, 250, 240, 0.9);
+		backdrop-filter: blur(16px);
 	}
 	.tabs-top {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 92px);
+		top: calc(env(safe-area-inset-top) + 108px);
 		left: 0;
 		right: 0;
 		z-index: 640;
 		display: flex;
-		gap: 8px;
+		gap: 7px;
 		justify-content: center;
 		padding: 0 12px;
 	}
 	.fab {
 		position: absolute;
-		right: 16px;
-		bottom: 160px;
+		right: 14px;
+		bottom: calc(env(safe-area-inset-bottom) + 100px);
 		z-index: 590;
-		width: 46px;
-		height: 46px;
+		width: 42px;
+		height: 42px;
 		border-radius: 50%;
-		border: none;
-		background: #fff;
-		box-shadow: var(--shadow);
-		font-size: 20px;
+		border: 1px solid rgba(6, 63, 61, 0.14);
+		background: rgba(255, 250, 240, 0.9);
+		backdrop-filter: blur(16px);
+		box-shadow: var(--shadow-soft);
+		font-size: 19px;
 		color: var(--ink);
 	}
 
 	.peek {
 		display: grid;
-		gap: 8px;
+		gap: 6px;
 	}
 	.peek-row {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
-		gap: 12px;
+		gap: 10px;
 	}
 	.peek strong {
-		font-size: 15px;
+		font-size: 14px;
+		letter-spacing: -0.01em;
 	}
 	.hint {
 		margin: 1px 0 0;
@@ -415,20 +532,21 @@
 	}
 	.legend {
 		display: flex;
-		gap: 12px;
-		font-size: 13px;
-		font-weight: 600;
+		gap: 9px;
+		font-size: 12px;
+		font-weight: 760;
 		color: var(--ink);
 		white-space: nowrap;
 	}
-	.legend span {
+	.legend span,
+	.legend-card p {
 		display: inline-flex;
 		align-items: center;
 		gap: 5px;
 	}
 	.d {
-		width: 9px;
-		height: 9px;
+		width: 8px;
+		height: 8px;
 		border-radius: 50%;
 		display: inline-block;
 	}
@@ -439,7 +557,7 @@
 		background: var(--violet);
 	}
 	.d.grey {
-		background: #9aa3b2;
+		background: #9aa8a5;
 	}
 	.sheet-head {
 		display: flex;
@@ -449,6 +567,7 @@
 	h1 {
 		font-size: 20px;
 		margin: 0 0 8px;
+		letter-spacing: -0.03em;
 	}
 	.count {
 		color: var(--muted);
@@ -468,14 +587,14 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 4px;
-		min-height: 36px;
+		min-height: 34px;
 		padding: 6px 12px 6px 8px;
-		border: none;
+		border: 1px solid var(--line);
 		border-radius: 999px;
-		background: #f1f4f9;
+		background: rgba(255, 255, 255, 0.66);
 		color: var(--ink);
-		font-size: 14px;
-		font-weight: 600;
+		font-size: 13px;
+		font-weight: 700;
 	}
 	.back .chev {
 		font-size: 19px;
@@ -489,15 +608,81 @@
 	.action-card h2 {
 		margin: 0;
 		font-size: 19px;
+		letter-spacing: -0.02em;
+	}
+	.info-panel {
+		display: grid;
+		gap: 12px;
+	}
+	.info-hero {
+		display: flex;
+		align-items: center;
+		gap: 13px;
+	}
+	.eyebrow {
+		margin: 0 0 2px;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	.lead {
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.35;
+		color: var(--muted);
+	}
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 7px;
+	}
+	.stats-grid div {
+		min-width: 0;
+		border-radius: 16px;
+		padding: 10px 8px;
+		background: rgba(255, 255, 255, 0.68);
+		border: 1px solid var(--line);
+		text-align: center;
+	}
+	.stats-grid span {
+		display: block;
+		font-size: 20px;
+		font-weight: 820;
+		line-height: 1;
+		letter-spacing: -0.04em;
+	}
+	.stats-grid small {
+		display: block;
+		margin-top: 4px;
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--muted);
+		white-space: nowrap;
+	}
+	.legend-card {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 6px;
+		padding: 10px;
+		border-radius: 18px;
+		background: rgba(6, 63, 61, 0.05);
+	}
+	.legend-card p {
+		margin: 0;
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--muted);
 	}
 	.toast {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 140px);
+		top: calc(env(safe-area-inset-top) + 132px);
 		left: 50%;
 		transform: translateX(-50%);
 		z-index: 700;
 		background: var(--ink);
-		color: #fff;
+		color: #fffaf0;
 		padding: 10px 16px;
 		border-radius: 999px;
 		font-size: 14px;
