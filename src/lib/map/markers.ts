@@ -3,7 +3,7 @@
 import type { Kamerastatus } from '$lib/types';
 
 export const STATUS_COLOR: Record<string, string> = {
-	Stadfesta: '#005a55', // deep civic teal
+	Bekreftet: '#005a55', // deep civic teal
 	Estimert: '#ff736d', // coral estimate
 	Ukjent: '#9aa8a5', // muted stone
 	Ingen: '#9aa8a5'

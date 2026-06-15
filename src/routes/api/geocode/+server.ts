@@ -20,7 +20,7 @@ function toHit(f: any): GeocodeHit | null {
 	const [lng, lat] = f?.geometry?.coordinates ?? [];
 	if (typeof lat !== 'number' || typeof lng !== 'number') return null;
 	const p = f.properties ?? {};
-	const namn: string = p.name || p.street || p.city || 'Ukjend stad';
+	const namn: string = p.name || p.street || p.city || 'Ukjent sted';
 	const parts = [p.name, p.street && [p.street, p.housenumber].filter(Boolean).join(' '), p.city, p.postcode]
 		.filter(Boolean)
 		.filter((v, i, a) => a.indexOf(v) === i);

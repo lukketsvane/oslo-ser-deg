@@ -19,10 +19,10 @@
 
 	// quick-pick chips mapped to real KATEGORIAR values
 	const quickCats: { label: string; value: Kategori }[] = [
-		{ label: 'Skole', value: 'Skule' },
+		{ label: 'Skole', value: 'Skole' },
 		{ label: 'Butikk', value: 'Kjøpesenter / næring' },
 		{ label: 'Kollektiv', value: 'Buss' },
-		{ label: 'Annet', value: 'Ukjend kameratype' }
+		{ label: 'Annet', value: 'Ukjent kameratype' }
 	];
 
 	const valid = $derived(namn.trim().length > 0);

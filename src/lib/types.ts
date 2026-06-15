@@ -2,28 +2,28 @@
 // (contains no secrets and no server-only imports).
 
 /** Notion `Kamerastatus` select options. */
-export type Kamerastatus = 'Stadfesta' | 'Estimert' | 'Ingen' | 'Ukjent';
+export type Kamerastatus = 'Bekreftet' | 'Estimert' | 'Ingen' | 'Ukjent';
 
 /** Notion `Kategori` select options. */
 export const KATEGORIAR = [
-	'Skule',
-	'Sjukehus',
-	'Offentleg/kommunalt bygg',
+	'Skole',
+	'Sykehus',
+	'Offentlig/kommunalt bygg',
 	'Buss',
 	'Trikk',
 	'T-bane',
 	'Tog',
-	'ALPR / skiltlesar',
+	'ALPR / skiltleser',
 	'CCTV / kamera',
 	'Fotoboks (ATK)',
-	'Ukjend kameratype',
+	'Ukjent kameratype',
 	'Flyplass',
 	'Kjøpesenter / næring',
 	'Parkering',
 	'Vakt / sikring',
-	'Bustad (borettslag/sameie)',
-	'Statleg etat',
-	'Båt / ferje'
+	'Bolig (borettslag/sameie)',
+	'Statlig etat',
+	'Båt / ferge'
 ] as const;
 export type Kategori = (typeof KATEGORIAR)[number];
 
@@ -38,15 +38,15 @@ export interface Camera {
 	eigar: string | null;
 	kamerastatus: Kamerastatus | null;
 	kameraTal: number | null;
-	/** latitude (Notion: Breiddegrad). null = not placed yet. */
+	/** latitude (Notion: Breddegrad). null = not placed yet. */
 	lat: number | null;
 	/** longitude (Notion: Lengdegrad). null = not placed yet. */
 	lng: number | null;
-	/** confirmation count (Notion: Stadfestingar). */
+	/** confirmation count (Notion: Bekreftelser). */
 	stadfestingar: number;
-	/** agreement percent 0–100 (Notion: Semje %). */
+	/** agreement percent 0–100 (Notion: Enighet %). */
 	semje: number | null;
-	/** recent contributor handles (Notion: Bidragsytarar). */
+	/** recent contributor handles (Notion: Bidragsytere). */
 	bidragsytarar: string[];
 	bydel: string | null;
 	typeUndertype: string | null;
@@ -87,8 +87,8 @@ export const EYEBALL_REWARD: Record<PatchAction | 'add', number> = {
 	move: 1
 };
 
-/** How many distinct confirmations promote an Estimert camera to Stadfesta. */
+/** How many distinct confirmations promote an Estimert camera to Bekreftet. */
 export const PROMOTE_THRESHOLD = 3;
 
-/** Max recent handles kept in the Bidragsytarar field. */
+/** Max recent handles kept in the Bidragsytere field. */
 export const MAX_BIDRAGSYTARAR = 10;

@@ -15,7 +15,7 @@ function isLng(n: unknown): n is number {
 // PATCH /api/cameras/[id] — confirm | estimate | move.
 export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 	const id = params.id;
-	if (!id) throw error(400, 'Manglar id');
+	if (!id) throw error(400, 'Mangler id');
 
 	let body: PatchCameraInput;
 	try {
@@ -32,7 +32,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 
 	switch (body.action) {
 		case 'move':
-			if (!isLat(body.lat) || !isLng(body.lng)) throw error(400, 'Ugyldige koordinatar');
+			if (!isLat(body.lat) || !isLng(body.lng)) throw error(400, 'Ugyldige koordinater');
 			camera = await moveCamera(id, body.lat, body.lng);
 			reward = EYEBALL_REWARD.move;
 			break;
@@ -45,7 +45,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 			reward = EYEBALL_REWARD.estimate;
 			break;
 		default:
-			throw error(400, 'Ukjend handling');
+			throw error(400, 'Ukjent handling');
 	}
 
 	if (locals.user && reward > 0) {
