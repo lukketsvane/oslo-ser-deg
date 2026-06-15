@@ -6,8 +6,10 @@
 	--ink: #0f172a;
 	--muted: #6b7280;
 	--line: rgba(15, 23, 42, 0.1);
-	--blue: #2374f6;
-	--violet: #a855f7;
+	/* Oslo graphic profile: deep civic green is the primary, coral the warm accent.
+	   (--blue / --violet keep their names for back-compat but now hold brand colours.) */
+	--blue: #005a55;
+	--violet: #ff736d;
 	--green: #10b981;
 	--aqua: #9ee7ee;
 	--mint: #bdeccf;
@@ -88,7 +90,7 @@ button {
 	font-weight: 800;
 	font-size: 14px;
 	letter-spacing: -0.01em;
-	box-shadow: 0 8px 20px rgba(35, 116, 246, 0.23);
+	box-shadow: 0 8px 20px rgba(0, 90, 85, 0.22);
 }
 .btn:disabled {
 	opacity: 0.55;
@@ -161,11 +163,11 @@ button {
 	color: var(--ink);
 }
 .tag-warn {
-	background: rgba(168, 85, 247, 0.1);
-	color: #7c3aed;
+	background: rgba(255, 115, 109, 0.14);
+	color: #b23b35;
 }
 .tag-ok {
-	background: rgba(35, 116, 246, 0.1);
+	background: rgba(0, 90, 85, 0.1);
 	color: var(--blue);
 }
 
@@ -201,8 +203,8 @@ button {
 	box-shadow: var(--shadow-soft);
 }
 .chip.active {
-	border-color: rgba(168, 85, 247, 0.25);
-	color: var(--violet);
+	border-color: rgba(0, 90, 85, 0.28);
+	color: var(--blue);
 	background: rgba(255, 255, 255, 0.94);
 }
 
@@ -272,18 +274,18 @@ button {
 	border-radius: 50%;
 	background: white;
 	border: 5px solid var(--blue);
-	box-shadow: 0 0 0 0 rgba(35, 116, 246, 0.45);
+	box-shadow: 0 0 0 0 rgba(0, 90, 85, 0.45);
 	animation: user-pulse 2s infinite;
 }
 @keyframes user-pulse {
 	0% {
-		box-shadow: 0 0 0 0 rgba(35, 116, 246, 0.45);
+		box-shadow: 0 0 0 0 rgba(0, 90, 85, 0.45);
 	}
 	70% {
-		box-shadow: 0 0 0 14px rgba(35, 116, 246, 0);
+		box-shadow: 0 0 0 14px rgba(0, 90, 85, 0);
 	}
 	100% {
-		box-shadow: 0 0 0 0 rgba(35, 116, 246, 0);
+		box-shadow: 0 0 0 0 rgba(0, 90, 85, 0);
 	}
 }
 

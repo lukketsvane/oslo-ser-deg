@@ -44,6 +44,23 @@
 	let authOpen = $state(false);
 	let pending: { lat: number; lng: number } | null = $state(null);
 
+	type Leader = { handle: string; eyeballs: number; streak: number };
+	let leaders = $state<Leader[]>([]);
+	let leadersLoading = $state(false);
+
+	async function loadLeaders() {
+		leadersLoading = true;
+		try {
+			const res = await fetch('/api/leaderboard');
+			const data = await res.json();
+			leaders = data.leaders ?? [];
+		} catch {
+			leaders = [];
+		} finally {
+			leadersLoading = false;
+		}
+	}
+
 	let mapComp: Map;
 
 	onMount(() => startPolling(7000));
@@ -114,6 +131,7 @@
 		selected = null;
 		mode = mode === 'info' ? 'browse' : 'info';
 		snap = mode === 'info' ? 'full' : 'peek';
+		if (mode === 'info') loadLeaders();
 	}
 
 	function openCamera(cam: Camera) {
@@ -299,6 +317,26 @@
 					<div><span>{counts.estimat}</span><small>estimat</small></div>
 					<div><span>{counts.oppdrag}</span><small>oppdrag</small></div>
 				</div>
+
+				<section class="list-card">
+					<header><strong>Toppliste</strong><span class="card-note">👁 eyeballs</span></header>
+					{#if leadersLoading && !leaders.length}
+						<p class="card-empty">Laster toppliste…</p>
+					{:else if !leaders.length}
+						<p class="card-empty">Ingen på topplista ennå. Bli den første!</p>
+					{:else}
+						{#each leaders as l, i}
+							<div class="lb-row" class:me={$identity.account && l.handle === $identity.handle}>
+								<span class="lb-rank" class:gold={i === 0} class:silver={i === 1} class:bronze={i === 2}
+									>{i + 1}</span
+								>
+								<span class="lb-name">{l.handle}</span>
+								{#if l.streak > 1}<span class="lb-streak">🔥{l.streak}</span>{/if}
+								<span class="lb-score">{l.eyeballs}</span>
+							</div>
+						{/each}
+					{/if}
+				</section>
 
 				<section class="list-card">
 					<header><strong>Siste punkter</strong><button onclick={() => (snap = 'half')}>Se kart</button></header>
@@ -692,10 +730,45 @@
 	}
 	.mini-row span { font-weight: 760; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.mini-row small { color: var(--muted); font-size: 12px; }
+	.card-note { color: var(--muted); font-size: 12px; font-weight: 700; }
+	.card-empty { color: var(--muted); font-size: 13px; padding: 4px 12px 14px; margin: 0; }
+	.lb-row {
+		display: grid;
+		grid-template-columns: 26px 1fr auto auto;
+		gap: 9px;
+		align-items: center;
+		padding: 9px 12px;
+		border-top: 1px solid var(--line);
+	}
+	.lb-row.me { background: rgba(0, 90, 85, 0.07); }
+	.lb-rank {
+		display: grid;
+		place-items: center;
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		font-size: 11px;
+		font-weight: 850;
+		color: var(--ink);
+		background: rgba(15, 23, 42, 0.06);
+	}
+	.lb-rank.gold { background: var(--mustard); }
+	.lb-rank.silver { background: #d6dbe0; }
+	.lb-rank.bronze { background: #e6c39a; }
+	.lb-name { font-weight: 760; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.lb-streak { font-size: 12px; font-weight: 750; color: var(--muted); }
+	.lb-score {
+		font-size: 13px;
+		font-weight: 850;
+		color: var(--blue);
+		background: rgba(0, 90, 85, 0.09);
+		padding: 4px 8px;
+		border-radius: 999px;
+	}
 	.add-inline { margin-top: 12px; }
 	.unlock-card {
-		border: 1px solid rgba(168, 85, 247, 0.18);
-		background: rgba(168, 85, 247, 0.07);
+		border: 1px solid rgba(0, 90, 85, 0.16);
+		background: rgba(0, 90, 85, 0.06);
 		border-radius: 18px;
 		padding: 14px;
 		margin-bottom: 10px;
