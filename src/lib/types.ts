@@ -90,5 +90,8 @@ export const EYEBALL_REWARD: Record<PatchAction | 'add', number> = {
 /** How many distinct confirmations promote an Estimert camera to Bekreftet. */
 export const PROMOTE_THRESHOLD = 3;
 
+/** Walking-distance radius (metres) for "Oppdrag" near a located, logged-in user. */
+export const WALK_RADIUS_M = 1000;
+
 /** Max recent handles kept in the Bidragsytere field. */
 export const MAX_BIDRAGSYTARAR = 10;

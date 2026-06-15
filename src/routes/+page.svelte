@@ -19,7 +19,14 @@
 		patchCamera
 	} from '$lib/stores/cameras';
 	import { identity } from '$lib/stores/identity';
-	import { EYEBALL_REWARD, type Camera, type Confidence, type Kategori } from '$lib/types';
+	import { distanceMeters } from '$lib/map/markers';
+	import {
+		EYEBALL_REWARD,
+		WALK_RADIUS_M,
+		type Camera,
+		type Confidence,
+		type Kategori
+	} from '$lib/types';
 
 	type Mode = 'browse' | 'detail' | 'contribute' | 'adjust-move' | 'place-new' | 'add-form' | 'info';
 	type Tab = 'Bekreftet' | 'Estimat' | 'Oppdrag';
@@ -60,11 +67,25 @@
 		return { bekrefta, estimat, oppdrag, totalt: $cameras.length };
 	});
 
+	// Oppdrag unlock: logged in AND sharing location. When unlocked we restrict
+	// missions to walking distance; otherwise we preview all of them (greyed out).
+	const oppdragUnlocked = $derived($identity.account && userLatLng != null);
+
+	function isMission(c: Camera) {
+		return c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent';
+	}
+	function withinWalk(c: Camera) {
+		if (c.lat == null || c.lng == null || !userLatLng) return false;
+		return distanceMeters([c.lat, c.lng], [userLatLng.lat, userLatLng.lng]) <= WALK_RADIUS_M;
+	}
+
 	const visible = $derived.by(() => {
 		const list = $cameras;
 		if (tab === 'Bekreftet') return list.filter((c) => c.kamerastatus === 'Bekreftet');
 		if (tab === 'Estimat') return list.filter((c) => c.kamerastatus === 'Estimert');
-		return list.filter((c) => c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent');
+		const missions = list.filter(isMission);
+		// Unlocked: only oppdrag in walking distance (map + list stay in sync).
+		return oppdragUnlocked ? missions.filter(withinWalk) : missions;
 	});
 
 	const recent = $derived.by(() => $cameras.slice(0, 4));
@@ -72,7 +93,8 @@
 	function tabCount(t: Tab) {
 		if (t === 'Bekreftet') return counts.bekrefta;
 		if (t === 'Estimat') return counts.estimat;
-		return counts.oppdrag;
+		// When unlocked, show how many missions are actually within walking distance.
+		return oppdragUnlocked ? $cameras.filter((c) => isMission(c) && withinWalk(c)).length : counts.oppdrag;
 	}
 
 	function flash(msg: string) {
@@ -357,17 +379,41 @@
 		{:else}
 			<div class="sheet-head">
 				<h1>{tab === 'Oppdrag' ? 'Oppdrag' : 'Nær deg'}</h1>
-				<span class="count">{visible.length} punkter</span>
+				<span class="count">
+					{#if tab === 'Oppdrag' && oppdragUnlocked}{visible.length} i gåavstand{:else}{visible.length} punkter{/if}
+				</span>
 			</div>
 			{#if $loading}
 				<p class="muted">Laster kart…</p>
 			{:else if $loadError}
 				<p class="muted">Feil: {$loadError}</p>
 			{:else}
+				{#if tab === 'Oppdrag' && !oppdragUnlocked}
+					<div class="unlock-card">
+						<p class="unlock-title">Lås opp oppdrag i gåavstand</p>
+						<p class="unlock-sub">
+							Logg inn og del lokasjon for å se oppdrag innen 1 km fra der du er.
+						</p>
+						<div class="btn-row">
+							{#if !$identity.account}
+								<button class="btn btn-sm" onclick={() => (authOpen = true)}>Logg inn</button>
+							{/if}
+							{#if !userLatLng}
+								<button
+									class="btn btn-sm"
+									class:btn-secondary={!$identity.account}
+									onclick={locateMe}>Del lokasjon</button
+								>
+							{/if}
+						</div>
+					</div>
+				{/if}
 				<NearbyList
 					cameras={$cameras}
 					{userLatLng}
 					missionsOnly={tab === 'Oppdrag'}
+					radiusM={tab === 'Oppdrag' && oppdragUnlocked ? WALK_RADIUS_M : null}
+					dimmed={tab === 'Oppdrag' && !oppdragUnlocked}
 					onselect={openCamera}
 				/>
 			{/if}
@@ -647,6 +693,17 @@
 	.mini-row span { font-weight: 760; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.mini-row small { color: var(--muted); font-size: 12px; }
 	.add-inline { margin-top: 12px; }
+	.unlock-card {
+		border: 1px solid rgba(168, 85, 247, 0.18);
+		background: rgba(168, 85, 247, 0.07);
+		border-radius: 18px;
+		padding: 14px;
+		margin-bottom: 10px;
+		display: grid;
+		gap: 4px;
+	}
+	.unlock-title { margin: 0; font-size: 15px; font-weight: 850; letter-spacing: -0.02em; }
+	.unlock-sub { margin: 0 0 8px; font-size: 13px; color: var(--muted); line-height: 1.35; }
 	.d { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 	.d.blue { background: var(--blue); }
 	.d.violet { background: var(--violet); }

@@ -64,7 +64,7 @@
 		const color = colorFor(camera.kamerastatus);
 		const selected = camera.id === selectedId ? ' selected' : '';
 		const html = `<span class="pin${selected}" style="--c:${color}"><i></i></span>`;
-		return L!.divIcon({ html, className: 'cctv-marker', iconSize: [24, 24], iconAnchor: [12, 12] });
+		return L!.divIcon({ html, className: 'cctv-marker', iconSize: [44, 44], iconAnchor: [22, 22] });
 	}
 
 	function clusterIcon(c: { getAllChildMarkers: () => Marker[]; getChildCount: () => number }): DivIcon {
@@ -274,6 +274,6 @@
 		transform: translate(-50%, -50%);
 		z-index: 500;
 		pointer-events: none;
-		drop-shadow: 0 8px 24px rgba(2, 40, 38, 0.22);
+		filter: drop-shadow(0 8px 24px rgba(2, 40, 38, 0.22));
 	}
 </style>

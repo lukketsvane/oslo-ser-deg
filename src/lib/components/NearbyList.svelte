@@ -8,19 +8,33 @@
 		cameras: Camera[];
 		userLatLng?: { lat: number; lng: number } | null;
 		missionsOnly?: boolean;
+		/** When set (with a known location), only keep rows within this many metres. */
+		radiusM?: number | null;
+		/** Render as a locked preview (greyed, not actionable). */
+		dimmed?: boolean;
 		onselect?: (camera: Camera) => void;
 	}
-	let { cameras, userLatLng = null, missionsOnly = false, onselect }: Props = $props();
+	let {
+		cameras,
+		userLatLng = null,
+		missionsOnly = false,
+		radiusM = null,
+		dimmed = false,
+		onselect
+	}: Props = $props();
 
 	const ranked = $derived.by(() => {
 		let list = cameras.filter((c) => c.lat != null && c.lng != null);
 		if (missionsOnly) {
 			list = list.filter((c) => c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent');
 		}
-		const withDist = list.map((c) => ({
+		let withDist = list.map((c) => ({
 			cam: c,
 			dist: userLatLng ? distanceMeters([c.lat!, c.lng!], [userLatLng.lat, userLatLng.lng]) : null
 		}));
+		if (radiusM != null && userLatLng) {
+			withDist = withDist.filter((x) => x.dist != null && x.dist <= radiusM);
+		}
 		withDist.sort((a, b) => {
 			if (a.dist == null || b.dist == null) return 0;
 			return a.dist - b.dist;
@@ -29,7 +43,7 @@
 	});
 </script>
 
-<ul class="list">
+<ul class="list" class:dimmed>
 	{#each ranked as { cam, dist }, i (cam.id)}
 		<li>
 			<button class="row" onclick={() => onselect?.(cam)}>
@@ -49,7 +63,13 @@
 			</button>
 		</li>
 	{:else}
-		<li class="empty">Ingen punkter i nærheten ennå.</li>
+		<li class="empty">
+			{#if missionsOnly && radiusM != null}
+				Ingen oppdrag i gåavstand akkurat nå.
+			{:else}
+				Ingen punkter i nærheten ennå.
+			{/if}
+		</li>
 	{/each}
 </ul>
 
@@ -60,6 +80,10 @@
 		padding: 0;
 		display: grid;
 		gap: 7px;
+	}
+	.list.dimmed {
+		opacity: 0.5;
+		filter: grayscale(0.6);
 	}
 	.row {
 		display: flex;

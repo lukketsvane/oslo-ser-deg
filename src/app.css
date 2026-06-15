@@ -212,6 +212,13 @@ button {
 	background: transparent;
 	border: none;
 }
+/* 44px transparent hit area; the visual pin stays 24px, centred inside it. */
+.cctv-marker {
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+}
 .cctv-marker .pin {
 	position: relative;
 	display: grid;
