@@ -63,6 +63,16 @@ export async function findUser(handle: string): Promise<UserRow | null> {
 	return res.results.length ? pageToUser(res.results[0]) : null;
 }
 
+/** Top users by eyeballs, for the leaderboard. */
+export async function listTopUsers(limit = 10): Promise<UserRow[]> {
+	const res = await notion().dataSources.query({
+		data_source_id: dsId(),
+		sorts: [{ property: P.eyeballs, direction: 'descending' }],
+		page_size: Math.min(Math.max(limit, 1), 100)
+	});
+	return res.results.map(pageToUser).filter((u) => u.handle);
+}
+
 export async function createUser(handle: string, passwordHash: string): Promise<UserRow> {
 	const page = await notion().pages.create({
 		parent: { type: 'data_source_id', data_source_id: dsId() },

@@ -88,7 +88,7 @@
 		border-radius: 50%;
 		flex: none;
 		margin-top: 8px;
-		box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+		box-shadow: 0 0 0 4px rgba(0, 90, 85, 0.1);
 	}
 	.title {
 		min-width: 0;
@@ -150,10 +150,10 @@
 		justify-content: space-between;
 		gap: 10px;
 		width: 100%;
-		border: 1px solid rgba(168, 85, 247, 0.14);
+		border: 1px solid rgba(255, 115, 109, 0.18);
 		border-radius: 16px;
-		background: rgba(168, 85, 247, 0.08);
-		color: #6d28d9;
+		background: rgba(255, 115, 109, 0.1);
+		color: #b23b35;
 		padding: 10px 12px;
 		font-size: 13px;
 		font-weight: 760;
