@@ -19,10 +19,10 @@
 
 	// quick-pick chips mapped to real KATEGORIAR values
 	const quickCats: { label: string; value: Kategori }[] = [
-		{ label: 'Skule', value: 'Skule' },
+		{ label: 'Skole', value: 'Skule' },
 		{ label: 'Butikk', value: 'Kjøpesenter / næring' },
 		{ label: 'Kollektiv', value: 'Buss' },
-		{ label: 'Anna', value: 'Ukjend kameratype' }
+		{ label: 'Annet', value: 'Ukjend kameratype' }
 	];
 
 	const valid = $derived(namn.trim().length > 0);
@@ -33,7 +33,7 @@
 
 	<div class="seg">
 		<button class="chip" class:active={confirm} onclick={() => (confirm = true)}>
-			<span class="cdot blue"></span>Bekrefta
+			<span class="cdot blue"></span>Bekreftet
 		</button>
 		<button class="chip" class:active={!confirm} onclick={() => (confirm = false)}>
 			<span class="cdot violet"></span>Estimat
@@ -52,14 +52,14 @@
 		<span class="pin">📍</span>
 		<Autocomplete
 			bind:value={namn}
-			placeholder="Namn på stad"
+			placeholder="Navn på sted"
 			onselect={(hit) => {
 				namn = hit.namn;
 				ongeocode?.(hit);
 			}}
 		/>
 	</div>
-	<p class="hint">Juster sehøgda — flytt krysshåret på kartet.</p>
+	<p class="hint">Juster sehøyden — flytt krysshåret på kartet.</p>
 
 	<div class="btn-row actions">
 		<button class="btn btn-sm btn-secondary" onclick={() => oncancel?.()}>Avbryt</button>
@@ -68,7 +68,7 @@
 			disabled={!valid || busy}
 			onclick={() => onsubmit?.({ namn: namn.trim(), kategori, confirm })}
 		>
-			{busy ? 'Lagrar…' : 'Lagre'}
+			{busy ? 'Lagrer…' : 'Lagre'}
 		</button>
 	</div>
 </div>

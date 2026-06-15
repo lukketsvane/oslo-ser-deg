@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Camera, Confidence } from '$lib/types';
 	import { EYEBALL_REWARD } from '$lib/types';
+	import { confidenceLabel } from '$lib/labels';
 
 	interface Props {
 		camera: Camera;
@@ -20,7 +21,7 @@
 
 <div class="form">
 	<header>
-		<h2>Send stadfesting</h2>
+		<h2>Send bekreftelse</h2>
 		<span class="reward">+{reward} eyeballs</span>
 	</header>
 	<p class="sub">{camera.namn}</p>
@@ -30,17 +31,17 @@
 		<button class="chip" class:active={!confirm} onclick={() => (confirm = false)}>Estimat</button>
 	</div>
 
-	<span class="fieldlabel">Kor sikker er du?</span>
+	<span class="fieldlabel">Hvor sikker er du?</span>
 	<div class="tabs">
 		{#each confidences as c}
 			<button class="chip" class:active={confidence === c} onclick={() => (confidence = c)}>
-				{c}
+				{confidenceLabel(c)}
 			</button>
 		{/each}
 	</div>
 
 	<label for="note">Kort notat</label>
-	<textarea id="note" bind:value={note} maxlength="200" placeholder="Skriv kva du ser eller veit…"
+	<textarea id="note" bind:value={note} maxlength="200" placeholder="Skriv hva du ser eller vet…"
 	></textarea>
 
 	<div class="btn-row actions">
