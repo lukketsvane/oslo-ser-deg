@@ -2,6 +2,7 @@
 	import type { Camera } from '$lib/types';
 	import { EYEBALL_REWARD } from '$lib/types';
 	import { colorFor } from '$lib/map/markers';
+	import { kategoriLabel, statusLabel } from '$lib/labels';
 
 	interface Props {
 		camera: Camera;
@@ -14,7 +15,7 @@
 
 	const semje = $derived(camera.semje ?? 0);
 	const isEstimat = $derived(camera.kamerastatus === 'Estimert' || camera.kamerastatus === 'Ukjent');
-	const statusLabel = $derived(isEstimat ? 'Estimat' : (camera.kamerastatus ?? 'Ukjent'));
+	const statusText = $derived(isEstimat ? 'Estimat' : statusLabel(camera.kamerastatus));
 </script>
 
 <div class="detail">
@@ -23,14 +24,14 @@
 			<span class="dot" style="background:{colorFor(camera.kamerastatus)}"></span>
 			<div class="title">
 				<h2>{camera.namn}</h2>
-				<span>{statusLabel} · {camera.bydel ?? 'Oslo'}</span>
+				<span>{statusText} · {camera.bydel ?? 'Oslo'}</span>
 			</div>
 		</div>
-		<button class="close" onclick={() => onclose?.()} aria-label="Lukk detaljar">×</button>
+		<button class="close" onclick={() => onclose?.()} aria-label="Lukk detaljer">×</button>
 	</header>
 
 	<div class="metric-row">
-		<strong>{camera.stadfestingar} stadfesting{camera.stadfestingar === 1 ? '' : 'ar'}</strong>
+		<strong>{camera.stadfestingar} bekreftelse{camera.stadfestingar === 1 ? '' : 'r'}</strong>
 		<div class="bar"><span style="width:{semje}%"></span></div>
 		<strong>{semje}%</strong>
 	</div>
@@ -43,8 +44,8 @@
 	{/if}
 
 	<div class="bento compact">
-		<div class="bento-cell main"><span class="k">Type</span><span class="v">{camera.kategori ?? '—'}</span></div>
-		<div class="bento-cell"><span class="k">Kjelde</span><span class="v">{camera.eigar ?? 'Fellesskapet'}</span></div>
+		<div class="bento-cell main"><span class="k">Type</span><span class="v">{kategoriLabel(camera.kategori)}</span></div>
+		<div class="bento-cell"><span class="k">Kilde</span><span class="v">{camera.eigar ?? 'Fellesskapet'}</span></div>
 		<div class="bento-cell"><span class="k">Bydel</span><span class="v">{camera.bydel ?? '—'}</span></div>
 		<div class="bento-cell"><span class="k">Oppdatert</span><span class="v">{camera.sistOppdatert ?? '—'}</span></div>
 	</div>
@@ -56,11 +57,11 @@
 	{/if}
 
 	<div class="btn-row actions">
-		<button class="btn btn-sm" onclick={() => onconfirm?.()}>Stadfest</button>
+		<button class="btn btn-sm" onclick={() => onconfirm?.()}>Bekreft</button>
 		<button class="btn btn-sm btn-secondary" onclick={() => onadjust?.()}>Juster</button>
 	</div>
 	{#if isEstimat}
-		<button class="errlink" onclick={() => onestimate?.()}>Framleis usikkert</button>
+		<button class="errlink" onclick={() => onestimate?.()}>Fortsatt usikkert</button>
 	{/if}
 </div>
 

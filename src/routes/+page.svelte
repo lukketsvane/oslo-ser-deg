@@ -22,9 +22,9 @@
 	import { EYEBALL_REWARD, type Camera, type Confidence, type Kategori } from '$lib/types';
 
 	type Mode = 'browse' | 'detail' | 'contribute' | 'adjust-move' | 'place-new' | 'add-form' | 'info';
-	type Tab = 'Bekrefta' | 'Estimat' | 'Oppdrag';
+	type Tab = 'Bekreftet' | 'Estimat' | 'Oppdrag';
 
-	const tabs: Tab[] = ['Bekrefta', 'Estimat', 'Oppdrag'];
+	const tabs: Tab[] = ['Bekreftet', 'Estimat', 'Oppdrag'];
 
 	let mode = $state<Mode>('browse');
 	let tab = $state<Tab>('Estimat');
@@ -62,7 +62,7 @@
 
 	const visible = $derived.by(() => {
 		const list = $cameras;
-		if (tab === 'Bekrefta') return list.filter((c) => c.kamerastatus === 'Stadfesta');
+		if (tab === 'Bekreftet') return list.filter((c) => c.kamerastatus === 'Stadfesta');
 		if (tab === 'Estimat') return list.filter((c) => c.kamerastatus === 'Estimert');
 		return list.filter((c) => c.kamerastatus === 'Estimert' || c.kamerastatus === 'Ukjent');
 	});
@@ -70,7 +70,7 @@
 	const recent = $derived.by(() => $cameras.slice(0, 4));
 
 	function tabCount(t: Tab) {
-		if (t === 'Bekrefta') return counts.bekrefta;
+		if (t === 'Bekreftet') return counts.bekrefta;
 		if (t === 'Estimat') return counts.estimat;
 		return counts.oppdrag;
 	}
@@ -110,7 +110,7 @@
 			flash(`+${EYEBALL_REWARD[action]} eyeballs`);
 			mode = 'detail';
 		} catch {
-			flash('Kunne ikkje lagre');
+			flash('Kunne ikke lagre');
 		} finally {
 			busy = false;
 		}
@@ -130,11 +130,11 @@
 		try {
 			await patchCamera(selected.id, { action: 'move', lat: c.lat, lng: c.lng }, { lat: c.lat, lng: c.lng });
 			identity.award(EYEBALL_REWARD.move);
-			flash('Plassering lagra');
+			flash('Plassering lagret');
 			mode = 'detail';
 			snap = 'half';
 		} catch {
-			flash('Kunne ikkje lagre');
+			flash('Kunne ikke lagre');
 		} finally {
 			busy = false;
 		}
@@ -179,7 +179,7 @@
 			flash(`+${EYEBALL_REWARD.add} eyeballs`);
 			openCamera(created);
 		} catch {
-			flash('Kunne ikkje lagre');
+			flash('Kunne ikke lagre');
 		} finally {
 			busy = false;
 			pending = null;
@@ -226,13 +226,13 @@
 
 	{#if browseChrome}
 		<div class="searchbar">
-			<Autocomplete placeholder="Søk adresse eller stad…" onselect={onSearchSelect} />
+			<Autocomplete placeholder="Søk adresse eller sted…" onselect={onSearchSelect} />
 			<button class="search-action" onclick={locateMe} aria-label="Finn meg">◎</button>
 		</div>
 		<div class="tabs-top">
 			{#each tabs as t}
 				<button class="chip" class:active={tab === t} onclick={() => (tab = t)}>
-					<i class={t === 'Bekrefta' ? 'blue' : t === 'Estimat' ? 'violet' : 'grey'}></i>
+					<i class={t === 'Bekreftet' ? 'blue' : t === 'Estimat' ? 'violet' : 'grey'}></i>
 					<span>{t}</span>
 					<b>{tabCount(t)}</b>
 				</button>
@@ -265,13 +265,13 @@
 
 				<div class="stats-grid">
 					<div class="big-stat"><span>{counts.totalt}</span><small>totalt</small></div>
-					<div><span>{counts.bekrefta}</span><small>bekrefta</small></div>
+					<div><span>{counts.bekrefta}</span><small>bekreftet</small></div>
 					<div><span>{counts.estimat}</span><small>estimat</small></div>
 					<div><span>{counts.oppdrag}</span><small>oppdrag</small></div>
 				</div>
 
 				<section class="list-card">
-					<header><strong>Siste punkt</strong><button onclick={() => (snap = 'half')}>Sjå kart</button></header>
+					<header><strong>Siste punkter</strong><button onclick={() => (snap = 'half')}>Se kart</button></header>
 					{#each recent as cam}
 						<button class="mini-row" onclick={() => openCamera(cam)}>
 							<i class={cam.kamerastatus === 'Stadfesta' ? 'blue' : cam.kamerastatus === 'Estimert' ? 'violet' : 'grey'}></i>
@@ -309,7 +309,7 @@
 				</header>
 				<div class="btn-row">
 					<button class="btn btn-sm btn-secondary" onclick={() => (mode = 'detail')}>Avbryt</button>
-					<button class="btn btn-sm" disabled={busy} onclick={saveMove}>{busy ? 'Lagrar…' : 'Lagre'}</button>
+					<button class="btn btn-sm" disabled={busy} onclick={saveMove}>{busy ? 'Lagrer…' : 'Lagre'}</button>
 				</div>
 			</div>
 		{:else if mode === 'place-new'}
@@ -320,7 +320,7 @@
 				</header>
 				<div class="btn-row">
 					<button class="btn btn-sm btn-secondary" onclick={close}>Avbryt</button>
-					<button class="btn btn-sm" onclick={confirmPlacement}>Set her</button>
+					<button class="btn btn-sm" onclick={confirmPlacement}>Sett her</button>
 				</div>
 			</div>
 		{:else if mode === 'add-form'}
@@ -349,10 +349,10 @@
 		{:else}
 			<div class="sheet-head">
 				<h1>{tab === 'Oppdrag' ? 'Oppdrag' : 'Nær deg'}</h1>
-				<span class="count">{visible.length} punkt</span>
+				<span class="count">{visible.length} punkter</span>
 			</div>
 			{#if $loading}
-				<p class="muted">Lastar kart…</p>
+				<p class="muted">Laster kart…</p>
 			{:else if $loadError}
 				<p class="muted">Feil: {$loadError}</p>
 			{:else}

@@ -24,9 +24,22 @@
 	}
 	const heightPx = $derived(dragging && liveH != null ? liveH : snapPx(snap));
 
+	// Scrim darkens the map behind dismissable sheets and fades as the sheet is
+	// dragged toward the dismiss line, so closing always has a clear target.
+	const scrimOpacity = $derived.by(() => {
+		if (!ondismiss) return 0;
+		const lo = snapPx('half') * 0.6;
+		const hi = snapPx('full');
+		const t = Math.max(0, Math.min(1, (heightPx - lo) / (hi - lo)));
+		return +(0.34 * t).toFixed(3);
+	});
+
 	let startY = 0;
 	let startH = 0;
 	let moved = false;
+	let lastY = 0;
+	let lastT = 0;
+	let vy = 0; // px/ms of pointer Y; positive = moving down
 
 	function down(e: PointerEvent) {
 		dragging = true;
@@ -34,12 +47,19 @@
 		startY = e.clientY;
 		startH = snapPx(snap);
 		liveH = startH;
+		lastY = e.clientY;
+		lastT = e.timeStamp;
+		vy = 0;
 		(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
 	}
 	function move(e: PointerEvent) {
 		if (!dragging) return;
 		const dy = startY - e.clientY;
 		if (Math.abs(dy) > 4) moved = true;
+		const dt = e.timeStamp - lastT;
+		if (dt > 0) vy = (e.clientY - lastY) / dt;
+		lastY = e.clientY;
+		lastT = e.timeStamp;
 		const min = ondismiss ? 0 : Math.max(48, peekPx - 48);
 		liveH = Math.max(min, Math.min(vh * 0.92, startH + dy));
 	}
@@ -47,19 +67,32 @@
 		if (!dragging) return;
 		dragging = false;
 		const target = liveH ?? snapPx(snap);
+		const flickDown = vy > 0.5;
+		const flickUp = vy < -0.5;
 		liveH = null;
-		if (ondismiss && target < Math.max(112, peekPx * 1.2)) {
-			ondismiss();
+		vy = 0;
+		const half = snapPx('half');
+
+		if (ondismiss) {
+			// A downward flick or a drag past ~60% of the half height closes it.
+			if ((flickDown && target < snapPx('full')) || target < half * 0.6) {
+				ondismiss();
+				return;
+			}
+			snap = flickUp ? 'full' : flickDown ? 'half' : closest(target, ['half', 'full']);
 			return;
 		}
-		const cands: Snap[] = ['peek', 'half', 'full'];
-		snap = cands.reduce((best, s) =>
+		snap = closest(target, ['peek', 'half', 'full']);
+	}
+	function closest(target: number, cands: Snap[]): Snap {
+		return cands.reduce((best, s) =>
 			Math.abs(snapPx(s) - target) < Math.abs(snapPx(best) - target) ? s : best
 		);
 	}
 	function toggle() {
 		if (moved) return;
-		snap = snap === 'peek' ? 'half' : 'peek';
+		if (ondismiss) snap = snap === 'full' ? 'half' : 'full';
+		else snap = snap === 'peek' ? 'half' : 'peek';
 	}
 
 	$effect(() => {
@@ -70,6 +103,15 @@
 	});
 </script>
 
+{#if ondismiss && scrimOpacity > 0.001}
+	<button
+		class="scrim"
+		class:dragging
+		style="opacity:{scrimOpacity}"
+		aria-label="Lukk panel"
+		onclick={() => ondismiss?.()}
+	></button>
+{/if}
 <section class="sheet" class:dragging style="height:{heightPx}px">
 	<div
 		class="handle-area"
@@ -98,6 +140,19 @@
 </section>
 
 <style>
+	.scrim {
+		position: absolute;
+		inset: 0;
+		z-index: 595;
+		border: 0;
+		padding: 0;
+		background: rgba(15, 23, 42, 1);
+		transition: opacity 0.26s cubic-bezier(0.22, 0.61, 0.36, 1);
+		cursor: pointer;
+	}
+	.scrim.dragging {
+		transition: none;
+	}
 	.sheet {
 		position: absolute;
 		left: 0;

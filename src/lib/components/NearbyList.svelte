@@ -2,6 +2,7 @@
 	import type { Camera } from '$lib/types';
 	import { EYEBALL_REWARD } from '$lib/types';
 	import { distanceMeters, formatDistance, colorFor } from '$lib/map/markers';
+	import { kategoriLabel } from '$lib/labels';
 
 	interface Props {
 		cameras: Camera[];
@@ -36,7 +37,7 @@
 				<span class="meta">
 					<span class="name">{cam.namn}</span>
 					<span class="sub">
-						{cam.kategori ?? 'Ukjend'}{#if dist != null} · {formatDistance(dist)}{/if}
+						{kategoriLabel(cam.kategori)}{#if dist != null} · {formatDistance(dist)}{/if}
 					</span>
 				</span>
 				{#if cam.kamerastatus === 'Estimert'}
@@ -48,7 +49,7 @@
 			</button>
 		</li>
 	{:else}
-		<li class="empty">Ingen punkt i nærleiken enno.</li>
+		<li class="empty">Ingen punkter i nærheten ennå.</li>
 	{/each}
 </ul>
 

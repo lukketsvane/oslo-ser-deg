@@ -12,7 +12,7 @@ export interface UserRow {
 }
 
 const P = {
-	handle: 'Brukarnamn',
+	handle: 'Brukernavn',
 	hash: 'Passordhash',
 	eyeballs: 'Eyeballs',
 	streak: 'Streak',

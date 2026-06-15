@@ -49,7 +49,7 @@
 
 		{#if $identity.account}
 			<h2>@{$identity.handle}</h2>
-			<p class="sub">👁 {$identity.eyeballs} eyeballs · {$identity.streak} dagars streak</p>
+			<p class="sub">👁 {$identity.eyeballs} eyeballs · {$identity.streak} dagers streak</p>
 			<button class="btn btn-secondary" onclick={logout}>Logg ut</button>
 			<button class="btn btn-ghost" onclick={() => onclose?.()}>Lukk</button>
 		{:else}
@@ -64,15 +64,15 @@
 
 			<p class="sub">
 				{tab === 'register'
-					? 'Brukarnamn og passord. Ingen e-post.'
-					: 'Logg inn for å ta vare på eyeballs på tvers av einingar.'}
+					? 'Brukernavn og passord. Ingen e-post.'
+					: 'Logg inn for å ta vare på eyeballs på tvers av enheter.'}
 			</p>
 
-			<label for="h">Brukarnamn</label>
+			<label for="h">Brukernavn</label>
 			<input
 				id="h"
 				bind:value={handle}
-				placeholder="vel eit brukarnamn"
+				placeholder="velg et brukernavn"
 				autocomplete="username"
 				maxlength="24"
 			/>
@@ -82,7 +82,7 @@
 				id="p"
 				type="password"
 				bind:value={password}
-				placeholder="minst 6 teikn"
+				placeholder="minst 6 tegn"
 				autocomplete={tab === 'register' ? 'new-password' : 'current-password'}
 				onkeydown={(e) => e.key === 'Enter' && submit()}
 			/>
@@ -97,11 +97,11 @@
 
 		{#if !standalone}
 			<div class="install">
-				<strong>📲 Legg på heimskjermen</strong>
+				<strong>📲 Legg på hjemskjermen</strong>
 				<ol>
 					<li>Trykk Del-knappen nede i Safari.</li>
-					<li>Vel <b>Legg til på Hjem-skjerm</b>.</li>
-					<li>Appen heiter då <b>OsloSerDeg</b>.</li>
+					<li>Velg <b>Legg til på Hjem-skjerm</b>.</li>
+					<li>Appen heter da <b>OsloSerDeg</b>.</li>
 				</ol>
 			</div>
 		{/if}
