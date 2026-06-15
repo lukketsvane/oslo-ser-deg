@@ -1,7 +1,7 @@
 {
-	"name": "cctv.oslo.no",
-	"short_name": "cctv.oslo",
-	"description": "Eit ope kart over overvakingskamera i Oslo. Vi ser deg, Oslo.",
+	"name": "OsloSerDeg",
+	"short_name": "OsloSerDeg",
+	"description": "Ope kart over overvakingskamera i Oslo.",
 	"lang": "nn",
 	"start_url": "/",
 	"scope": "/",

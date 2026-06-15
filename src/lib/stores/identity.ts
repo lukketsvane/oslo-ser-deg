@@ -13,8 +13,8 @@ export interface Identity {
 
 const KEY = 'cctv-oslo-identity';
 
-const ADJ = ['taste', 'kr4', 'lukket', 'natt', 'gate', 'skygge', 'lyn', 'kald', 'stille', 'rapp'];
-const NOUN = ['finger', 'vler', 'svane', 'ugle', 'rev', 'måke', 'katt', 'ravn', 'mus', 'ulv'];
+const ADJ = ['taste', 'kr4', 'natt', 'gate', 'skygge', 'lyn', 'kald', 'stille', 'rapp', 'tåke'];
+const NOUN = ['finger', 'vler', 'ugle', 'rev', 'måke', 'katt', 'ravn', 'mus', 'ulv', 'hauk'];
 
 function randomHandle(): string {
 	const a = ADJ[Math.floor(Math.random() * ADJ.length)];

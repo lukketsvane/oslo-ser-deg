@@ -1,10 +1,17 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { identity } from '$lib/stores/identity';
 
 	interface Props {
 		onclose?: () => void;
 	}
 	let { onclose }: Props = $props();
+
+	// Hide the "add to home screen" tip once the app is already installed/standalone.
+	const standalone =
+		browser &&
+		(window.matchMedia('(display-mode: standalone)').matches ||
+			(navigator as unknown as { standalone?: boolean }).standalone === true);
 
 	let tab = $state<'login' | 'register'>('register');
 	let handle = $state('');
@@ -57,7 +64,7 @@
 
 			<p class="sub">
 				{tab === 'register'
-					? 'Vel eit brukarnamn og passord. Ingen e-post, inga stadfesting.'
+					? 'Brukarnamn og passord. Ingen e-post.'
 					: 'Logg inn for å ta vare på eyeballs på tvers av einingar.'}
 			</p>
 
@@ -65,7 +72,7 @@
 			<input
 				id="h"
 				bind:value={handle}
-				placeholder="t.d. lukketsvane"
+				placeholder="vel eit brukarnamn"
 				autocomplete="username"
 				maxlength="24"
 			/>
@@ -86,6 +93,17 @@
 				{busy ? '…' : tab === 'register' ? 'Lag konto' : 'Logg inn'}
 			</button>
 			<button class="btn btn-ghost" onclick={() => onclose?.()}>Avbryt</button>
+		{/if}
+
+		{#if !standalone}
+			<div class="install">
+				<strong>📲 Legg på heimskjermen</strong>
+				<ol>
+					<li>Trykk Del-knappen nede i Safari.</li>
+					<li>Vel <b>Legg til på Hjem-skjerm</b>.</li>
+					<li>Appen heiter då <b>OsloSerDeg</b>.</li>
+				</ol>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -154,5 +172,23 @@
 		color: #dc2626;
 		font-size: 13px;
 		margin: 2px 0 0;
+	}
+	.install {
+		margin-top: 6px;
+		padding-top: 12px;
+		border-top: 1px solid var(--line);
+	}
+	.install strong {
+		font-size: 14px;
+	}
+	.install ol {
+		margin: 8px 0 0;
+		padding-left: 18px;
+		color: var(--muted);
+		font-size: 13px;
+		line-height: 1.5;
+	}
+	.install b {
+		color: var(--ink);
 	}
 </style>
