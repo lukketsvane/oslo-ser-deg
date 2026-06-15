@@ -3,10 +3,10 @@
 import type { Kamerastatus } from '$lib/types';
 
 export const STATUS_COLOR: Record<string, string> = {
-	Stadfesta: '#1d6fff', // confirmed — blue (matches mockup confirmed pins)
-	Estimert: '#a855f7', // estimate — purple/violet
-	Ukjent: '#9aa3b2', // unknown — grey
-	Ingen: '#9aa3b2'
+	Stadfesta: '#005a55', // deep civic teal
+	Estimert: '#ff736d', // coral estimate
+	Ukjent: '#9aa8a5', // muted stone
+	Ingen: '#9aa8a5'
 };
 
 export function colorFor(status: Kamerastatus | null): string {
