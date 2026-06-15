@@ -1,0 +1,17 @@
+{
+	"name": "cctv.oslo.no",
+	"short_name": "cctv.oslo",
+	"description": "Eit ope kart over overvakingskamera i Oslo. Vi ser deg, Oslo.",
+	"lang": "nn",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"orientation": "portrait",
+	"background_color": "#0b1020",
+	"theme_color": "#0b1020",
+	"icons": [
+		{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+		{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+	]
+}

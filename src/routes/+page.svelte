@@ -227,7 +227,7 @@
 		<div class="toast">{toast}</div>
 	{/if}
 
-	<BottomSheet bind:snap peekPx={140}>
+	<BottomSheet bind:snap peekPx={116}>
 		{#if mode === 'detail' && selected}
 			<button class="close" onclick={close} aria-label="Lukk">✕</button>
 			<CameraDetail
@@ -383,7 +383,7 @@
 
 	.peek {
 		display: grid;
-		gap: 12px;
+		gap: 10px;
 	}
 	.peek-row {
 		display: flex;
@@ -392,11 +392,11 @@
 		gap: 12px;
 	}
 	.peek strong {
-		font-size: 16px;
+		font-size: 15px;
 	}
 	.hint {
-		margin: 2px 0 0;
-		font-size: 12px;
+		margin: 1px 0 0;
+		font-size: 11px;
 		color: var(--muted);
 	}
 	.legend {
