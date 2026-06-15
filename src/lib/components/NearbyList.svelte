@@ -32,7 +32,7 @@
 	{#each ranked as { cam, dist }, i (cam.id)}
 		<li>
 			<button class="row" onclick={() => onselect?.(cam)}>
-				<span class="badge" style="background:{colorFor(cam.kamerastatus)}">{i + 1}</span>
+				<span class="badge" style="--c:{colorFor(cam.kamerastatus)}"><i>{i + 1}</i></span>
 				<span class="meta">
 					<span class="name">{cam.namn}</span>
 					<span class="sub">
@@ -40,9 +40,9 @@
 					</span>
 				</span>
 				{#if cam.kamerastatus === 'Estimert'}
-					<span class="tag tag-grey">Ubekrefta</span>
+					<span class="tag tag-grey">Estimat</span>
 				{:else if cam.kamerastatus === 'Ukjent'}
-					<span class="tag tag-warn">Treng justering</span>
+					<span class="tag tag-warn">Sjekk</span>
 				{/if}
 				<span class="reward">+{EYEBALL_REWARD.confirm}</span>
 			</button>
@@ -58,30 +58,50 @@
 		margin: 0;
 		padding: 0;
 		display: grid;
-		gap: 4px;
+		gap: 7px;
 	}
 	.row {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 9px;
 		width: 100%;
-		background: transparent;
-		border: none;
-		padding: 8px 4px;
+		background: rgba(255, 255, 255, 0.62);
+		border: 1px solid var(--line);
+		border-radius: 17px;
+		padding: 9px;
 		text-align: left;
-		border-bottom: 1px solid var(--line);
+		box-shadow: inset 0 -1px 0 rgba(6, 63, 61, 0.04);
 	}
 	.badge {
-		width: 24px;
-		height: 24px;
+		position: relative;
+		width: 28px;
+		height: 28px;
 		border-radius: 50%;
 		flex: none;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #fff;
-		font-size: 12px;
-		font-weight: 700;
+		background: var(--c);
+		color: #fffaf0;
+		font-size: 11px;
+		font-weight: 820;
+		box-shadow: 0 4px 12px rgba(2, 40, 38, 0.18);
+	}
+	.badge::before {
+		content: '';
+		position: absolute;
+		left: 6px;
+		right: 6px;
+		top: 10px;
+		height: 7px;
+		border-radius: 999px 999px 50% 50%;
+		background: rgba(255, 250, 240, 0.9);
+	}
+	.badge i {
+		position: relative;
+		font-style: normal;
+		z-index: 1;
+		color: var(--ink);
 	}
 	.meta {
 		flex: 1;
@@ -89,8 +109,9 @@
 	}
 	.name {
 		display: block;
-		font-weight: 600;
+		font-weight: 760;
 		font-size: 14px;
+		letter-spacing: -0.01em;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -98,12 +119,16 @@
 	.sub {
 		display: block;
 		font-size: 12px;
+		font-weight: 620;
 		color: var(--muted);
 	}
 	.reward {
-		font-size: 13px;
-		font-weight: 700;
+		font-size: 12px;
+		font-weight: 820;
 		color: var(--blue);
+		background: rgba(0, 90, 85, 0.08);
+		padding: 5px 7px;
+		border-radius: 999px;
 	}
 	.empty {
 		color: var(--muted);
